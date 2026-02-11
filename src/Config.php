@@ -1,0 +1,67 @@
+<?php
+namespace PekLaiho\Deven;
+
+class Config
+{
+    protected ?string $isoFile = null;
+    protected int $cpus = 1;
+    protected int $ram = 8; // GB
+    protected int $disk = 32; // GB
+
+    public function __construct(
+        protected string $name,
+        protected string $dir
+    ) {
+
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getDir(): string
+    {
+        return $this->dir;
+    }
+
+    public function getIsoFile(): ?string
+    {
+        return $this->isoFile;
+    }
+
+    public function setIsoFile(?string $value): void
+    {
+        $this->isoFile = $value;
+    }
+
+    public function getCpus(): int
+    {
+        return $this->cpus;
+    }
+
+    public function setCpus(int $value): void
+    {
+        $this->cpus = $value;
+    }
+
+    public function getRam(): int
+    {
+        return $this->ram;
+    }
+
+    public function setRam(int $value): void
+    {
+        $this->ram = $value;
+    }
+
+    public function getDisk(): int
+    {
+        return $this->disk;
+    }
+
+    public function setDisk(int $value): void
+    {
+        $this->disk = $value;
+    }
+}

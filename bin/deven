@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+<?php
+require(__DIR__ . '/../vendor/autoload.php');
+
+$configFinder = new PekLaiho\Deven\ConfigFinder();
+$configFile = $configFinder->find();
+
+if (!$configFile) {
+    fwrite(STDERR, "Unable to find deven.yml file");
+    exit(1);
+}
+
+$configReader = new PekLaiho\Deven\ConfigReader();
+$config = $configReader->read($configFile);
+
+var_dump($config);

@@ -1,0 +1,33 @@
+{
+    "name": "peklaiho/deven",
+    "description": "Tool for managing VMs for development environments",
+    "keywords": [
+        "vm"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Pekka Laiho",
+            "email": "pekka.i.laiho@gmail.com",
+            "homepage": "https://laihoconsulting.com/"
+        }
+    ],
+    "support": {
+        "source": "https://github.com/peklaiho/deven"
+    },
+    "require": {
+        "php": ">=8.0",
+        "symfony/yaml": "^8.0"
+    },
+    "require-dev": {
+
+    },
+    "autoload": {
+        "psr-4": {
+            "PekLaiho\\Deven\\": "src/"
+        }
+    },
+    "bin": [
+        "bin/deven"
+    ]
+}
