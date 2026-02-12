@@ -5,6 +5,7 @@ require(__DIR__ . '/../vendor/autoload.php');
 // If no arguments, show help and exit
 if ($argc < 2) {
     echo 'Available commands:' . PHP_EOL;
+    echo 'list-vms' . PHP_EOL;
     echo 'status' . PHP_EOL;
     exit(1);
 }
@@ -28,7 +29,9 @@ $hypervisor = new PekLaiho\Deven\VirtualBox();
 $command = $argv[1];
 $args = array_slice($argv, 2);
 
-if (str_starts_with('status', $command)) {
+if (str_starts_with('list-vms', $command)) {
+    $cmd = new PekLaiho\Deven\Cmd\ListVms();
+} elseif (str_starts_with('status', $command)) {
     $cmd = new PekLaiho\Deven\Cmd\Status();
 } else {
     fwrite(STDERR, "Unknown command: $command");

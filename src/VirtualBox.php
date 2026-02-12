@@ -3,9 +3,28 @@ namespace PekLaiho\Deven;
 
 class VirtualBox implements IHypervisor
 {
-    public function list(): array
+    public function listVms(): array
     {
-        return [];
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'list',
+            'vms',
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            fwrite(STDERR, 'Error: ' . $result->getStderr());
+            exit(1);
+        }
+
+        $lines = explode(PHP_EOL, $result->getStdout());
+
+        $result = [];
+
+        foreach ($lines as $line) {
+            $result[] = $line;
+        }
+
+        return $result;
     }
 
     public function status(string $vmName): ?array
