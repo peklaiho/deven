@@ -21,7 +21,10 @@ class VirtualBox implements IHypervisor
         $result = [];
 
         foreach ($lines as $line) {
-            $result[] = $line;
+            $parts = explode(' ', trim($line));
+            if (count($parts) == 2) {
+                $result[] = Utils::removeQuotes($parts[0]);
+            }
         }
 
         return $result;
@@ -51,8 +54,8 @@ class VirtualBox implements IHypervisor
                 continue;
             }
 
-            $key = $this->removeQuotes(substr($line, 0, $index));
-            $value = $this->removeQuotes(substr($line, $index + 1));
+            $key = Utils::removeQuotes(substr($line, 0, $index));
+            $value = Utils::removeQuotes(substr($line, $index + 1));
 
             if ($key && $value) {
                 $result[$key] = $value;
@@ -60,16 +63,5 @@ class VirtualBox implements IHypervisor
         }
 
         return $result;
-    }
-
-    private function removeQuotes(string $value): string
-    {
-        $value = trim($value);
-
-        if (str_starts_with($value, '"') && str_ends_with($value, '"')) {
-            $value = substr($value, 1, -1);
-        }
-
-        return $value;
     }
 }
