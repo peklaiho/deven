@@ -45,6 +45,10 @@ class ConfigReader
             $config->setDisk($data['disk']);
         }
 
+        if (array_key_exists('os_type', $data)) {
+            $config->setOsType($data['os_type']);
+        }
+
         return $config;
     }
 }

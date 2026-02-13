@@ -3,6 +3,44 @@ namespace PekLaiho\Deven;
 
 class VirtualBox implements IHypervisor
 {
+    public function create(Config $config): void
+    {
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'createvm',
+            '--name',
+            $config->getName(),
+            '--ostype',
+            $config->getOsType(),
+            '--register',
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            fwrite(STDERR, 'Error: ' . $result->getStderr());
+            exit(1);
+        }
+    }
+
+    public function destroy(string $vmName): void
+    {
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'unregistervm',
+            $vmName,
+            '--delete',
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            fwrite(STDERR, 'Error: ' . $result->getStderr());
+            exit(1);
+        }
+    }
+
+    public function exists(string $vmName): bool
+    {
+        return in_array($vmName, $this->listVms());
+    }
+
     public function listVms(): array
     {
         $result = (new ShellRunner())->run([
@@ -30,7 +68,7 @@ class VirtualBox implements IHypervisor
         return $result;
     }
 
-    public function status(string $vmName): ?array
+    public function status(string $vmName): array
     {
         $result = (new ShellRunner())->run([
             'VBoxManage',
@@ -40,7 +78,8 @@ class VirtualBox implements IHypervisor
         ]);
 
         if ($result->getStatus() !== 0) {
-            return null;
+            fwrite(STDERR, 'Error: ' . $result->getStderr());
+            exit(1);
         }
 
         $lines = explode(PHP_EOL, $result->getStdout());

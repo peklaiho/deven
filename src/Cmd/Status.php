@@ -8,12 +8,12 @@ class Status implements ICommand
 {
     public function execute(IHypervisor $hypervisor, Config $config, array $args): void
     {
-        $status = $hypervisor->status($config->getName());
-
-        if (!$status) {
+        if (!$hypervisor->exists($config->getName())) {
             echo 'No VM found.' . PHP_EOL;
             exit(1);
         }
+
+        $status = $hypervisor->status($config->getName());
 
         // Special formats
         if (in_array('--json', $args)) {

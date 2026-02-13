@@ -8,6 +8,10 @@ class Config
     protected int $ram = 8; // GB
     protected int $disk = 32; // GB
 
+    // OS Type for VirtualBox
+    // Use Linux_64 for generic Linux
+    protected string $osType = 'Debian13_64';
+
     public function __construct(
         protected string $name,
         protected string $dir
@@ -63,5 +67,15 @@ class Config
     public function setDisk(int $value): void
     {
         $this->disk = $value;
+    }
+
+    public function getOsType(): string
+    {
+        return $this->osType;
+    }
+
+    public function setOsType(string $value): void
+    {
+        $this->osType = $value;
     }
 }
