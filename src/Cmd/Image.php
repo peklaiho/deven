@@ -7,8 +7,6 @@ use PekLaiho\Deven\Utils;
 
 class Image implements ICommand
 {
-    public const IMAGE_DIR = DEVEN_DIR . DIRECTORY_SEPARATOR . 'images';
-
     public function execute(IHypervisor $hypervisor, Config $config, array $args): void
     {
         $subcommands = [
@@ -36,14 +34,44 @@ class Image implements ICommand
 
     public function cmdDownload(IHypervisor $hypervisor, Config $config, array $args): void
     {
-        $infofile = 'https://cdimage.debian.org/images/cloud/trixie/latest/debian-13-generic-amd64.json';
-        $imagefile = 'https://cdimage.debian.org/images/cloud/trixie/latest/debian-13-generic-arm64.tar.xz';
+        $targetFile = DEVEN_IMAGE_DIR . DIRECTORY_SEPARATOR . 'debian-13-generic-amd64.vdi';
 
-        echo 'download';
+        if (file_exists($targetFile)) {
+            Utils::error("File $targetFile already exists, no need to download");
+        }
+
+        // First download the raw image if we don't have it yet
+
+        $imageUrl = 'https://cdimage.debian.org/images/cloud/trixie/latest/debian-13-generic-amd64.tar.xz';
+        $hashUrl = 'https://cloud.debian.org/images/cloud/trixie/latest/SHA512SUMS';
+
+        $imageFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'debian-13-generic-amd64.tar.xz';
+        $hashFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'SHA512SUMS';
+
+        if (!file_exists($imageFile)) {
+            Utils::downloadFile($imageUrl, $imageFile);
+        }
+        if (!file_exists($hashFile)) {
+            Utils::downloadFile($hashUrl, $hashFile);
+        }
+
+        // Then verify the hash
+
+        $hashes = Utils::readHashFile($hashFile);
+        Utils::verifyHash($imageFile, $hashes['debian-13-generic-amd64.tar.xz']);
+
+        // Extract the archive if needed
+
+        $rawFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'debian-13-generic-amd64.raw';
+
+        if (!file_exists($rawFile)) {
+            Utils::extractFileFromArchive($imageFile, 'disk.raw', $rawFile);
+        }
+
     }
 
     public function cmdList(IHypervisor $hypervisor, Config $config, array $args): void
     {
-        echo 'list';
+        // TODO
     }
 }
