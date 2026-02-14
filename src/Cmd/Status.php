@@ -3,31 +3,31 @@ namespace PekLaiho\Deven\Cmd;
 
 use PekLaiho\Deven\Config;
 use PekLaiho\Deven\IHypervisor;
+use PekLaiho\Deven\Utils;
 
 class Status implements ICommand
 {
     public function execute(IHypervisor $hypervisor, Config $config, array $args): void
     {
         if (!$hypervisor->exists($config->getName())) {
-            echo 'No VM found.' . PHP_EOL;
-            exit(1);
+            Utils::error('No VM found.');
         }
 
         $status = $hypervisor->status($config->getName());
 
         // Special formats
         if (in_array('--json', $args)) {
-            echo json_encode($status, JSON_PRETTY_PRINT);
+            Utils::outln(json_encode($status, JSON_PRETTY_PRINT));
             exit(0);
         }
 
         // Default: Just show if it is running or not
         if ($status['VMState'] === 'poweroff') {
-            echo 'VM is powered off.' . PHP_EOL;
+            Utils::outln('VM is powered off.');
         } elseif ($status['VMState'] === 'running') {
-            echo 'VM is running.' . PHP_EOL;
+            Utils::outln('VM is running.');
         } else {
-            echo 'VM state: ' . $status['VMState'] . PHP_EOL;
+            Utils::outln('VM state: ' . $status['VMState']);
         }
     }
 }

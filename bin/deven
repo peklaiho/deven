@@ -4,19 +4,28 @@ require(__DIR__ . '/../vendor/autoload.php');
 
 // If no arguments, show help and exit
 if ($argc < 2) {
-    echo 'Available commands:' . PHP_EOL;
-    echo 'create' . PHP_EOL;
-    echo 'destroy' . PHP_EOL;
-    echo 'status' . PHP_EOL;
-    exit(1);
+    PekLaiho\Deven\Utils::outln('Available commands:');
+    PekLaiho\Deven\Utils::outln('create');
+    PekLaiho\Deven\Utils::outln('destroy');
+    PekLaiho\Deven\Utils::outln('image');
+    PekLaiho\Deven\Utils::outln('status');
+    exit(0);
 }
+
+$homeDir = getenv('HOME');
+if (!$homeDir) {
+    PekLaiho\Deven\Utils::error('Unable to read user home directory from environment');
+}
+
+// Create directory for deven
+define('DEVEN_DIR', $homeDir . DIRECTORY_SEPARATOR . '.deven');
+PekLaiho\Deven\Utils::createDir(DEVEN_DIR);
 
 $configFinder = new PekLaiho\Deven\ConfigFinder();
 $configFile = $configFinder->find();
 
 if (!$configFile) {
-    fwrite(STDERR, "Unable to find deven.yml file");
-    exit(1);
+    PekLaiho\Deven\Utils::error('Unable to find deven.yml file in current directory');
 }
 
 $configReader = new PekLaiho\Deven\ConfigReader();
@@ -27,18 +36,23 @@ $result = $runner->run(['sleep', '1']);
 
 $hypervisor = new PekLaiho\Deven\VirtualBox();
 
-$command = $argv[1];
-$args = array_slice($argv, 2);
+$commandMap = [
+    'create' => new PekLaiho\Deven\Cmd\Create(),
+    'destroy' => new PekLaiho\Deven\Cmd\Destroy(),
+    'image' => new PekLaiho\Deven\Cmd\Image(),
+    'status' => new PekLaiho\Deven\Cmd\Status(),
+];
 
-if (str_starts_with('create', $command)) {
-    $cmd = new PekLaiho\Deven\Cmd\Create();
-} elseif (str_starts_with('destroy', $command)) {
-    $cmd = new PekLaiho\Deven\Cmd\Destroy();
-} elseif (str_starts_with('status', $command)) {
-    $cmd = new PekLaiho\Deven\Cmd\Status();
-} else {
-    fwrite(STDERR, "Unknown command: $command" . PHP_EOL);
-    exit(1);
+$command = null;
+foreach ($commandMap as $name => $cmd) {
+    if (str_starts_with($name, $argv[1])) {
+        $command = $cmd;
+        break;
+    }
 }
 
-$cmd->execute($hypervisor, $config, $args);
+if (!$command) {
+    PekLaiho\Deven\Utils::error('Unknown command: ' . $argv[1]);
+}
+
+$command->execute($hypervisor, $config, array_slice($argv, 2));

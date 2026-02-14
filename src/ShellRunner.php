@@ -16,8 +16,7 @@ class ShellRunner
         $process = proc_open($command, $descriptorspec, $pipes);
 
         if (!is_resource($process)) {
-            fwrite(STDERR, "Unable to run shell command");
-            exit(1);
+            Utils::error('Unable to run shell command');
         }
 
         // Close stdin (we are not providing any input)

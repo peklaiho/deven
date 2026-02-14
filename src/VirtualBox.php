@@ -16,8 +16,7 @@ class VirtualBox implements IHypervisor
         ]);
 
         if ($result->getStatus() !== 0) {
-            fwrite(STDERR, 'Error: ' . $result->getStderr());
-            exit(1);
+            Utils::error('Error: ' . $result->getStderr());
         }
     }
 
@@ -31,8 +30,7 @@ class VirtualBox implements IHypervisor
         ]);
 
         if ($result->getStatus() !== 0) {
-            fwrite(STDERR, 'Error: ' . $result->getStderr());
-            exit(1);
+            Utils::error('Error: ' . $result->getStderr());
         }
     }
 
@@ -50,8 +48,7 @@ class VirtualBox implements IHypervisor
         ]);
 
         if ($result->getStatus() !== 0) {
-            fwrite(STDERR, 'Error: ' . $result->getStderr());
-            exit(1);
+            Utils::error('Error: ' . $result->getStderr());
         }
 
         $lines = explode(PHP_EOL, $result->getStdout());
@@ -78,8 +75,7 @@ class VirtualBox implements IHypervisor
         ]);
 
         if ($result->getStatus() !== 0) {
-            fwrite(STDERR, 'Error: ' . $result->getStderr());
-            exit(1);
+            Utils::error('Error: ' . $result->getStderr());
         }
 
         $lines = explode(PHP_EOL, $result->getStdout());
