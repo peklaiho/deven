@@ -17,9 +17,11 @@ if (!$homeDir) {
     PekLaiho\Deven\Utils::error('Unable to read user home directory from environment');
 }
 
-// Create directory for deven
+// Create directories for deven
 define('DEVEN_DIR', $homeDir . DIRECTORY_SEPARATOR . '.deven');
+define('DEVEN_IMAGE_DIR', DEVEN_DIR . DIRECTORY_SEPARATOR . 'images');
 PekLaiho\Deven\Utils::createDir(DEVEN_DIR);
+PekLaiho\Deven\Utils::createDir(DEVEN_IMAGE_DIR);
 
 $configFinder = new PekLaiho\Deven\ConfigFinder();
 $configFile = $configFinder->find();
