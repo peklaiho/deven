@@ -16,8 +16,8 @@
         "source": "https://github.com/peklaiho/deven"
     },
     "require": {
-        "php": ">=8.0",
-        "symfony/yaml": "^8.0"
+        "php": ">=8.2",
+        "symfony/yaml": "^7.0"
     },
     "require-dev": {
 
