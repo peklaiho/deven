@@ -1,0 +1,2 @@
+#!/bin/sh
+exec ssh -v -i ~/.deven/ssh-key -p 2222 deven@127.0.0.1

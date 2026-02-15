@@ -11,6 +11,7 @@ interface IHypervisor
     public function detachHardDisk(string $vmName): void;
     public function detachDvdDrive(string $vmName): void;
     public function exists(string $vmName): bool;
+    public function forwardPort(string $vmName, string $ruleName, int $hostPort, int $guestPort): void;
     public function listVms(): array;
     public function resizeDisk(string $file, int $size): void;
     public function setCpusAndMemory(string $vmName, int $cpus, int $ram): void;

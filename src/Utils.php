@@ -10,7 +10,7 @@ class Utils
         if (!is_readable($source)) {
             self::error("Unable to read file $source");
         } elseif (file_exists($dest)) {
-            self::error("File $file already exists");
+            self::error("File $dest already exists");
         }
 
         if (!copy($source, $dest)) {
@@ -160,6 +160,17 @@ class Utils
 
         if ($parts[0] !== $correctHash) {
             self::error("Hash for file $file does not match");
+        }
+    }
+
+    public static function writeFile(string $file, string $data): void
+    {
+        if (file_exists($file)) {
+            self::error("File $file already exists");
+        }
+
+        if (file_put_contents($file, $data) === false) {
+            self::error("Unable to write file $file");
         }
     }
 }

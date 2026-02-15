@@ -79,6 +79,21 @@ class VirtualBox implements IHypervisor
         return in_array($vmName, $this->listVms());
     }
 
+    public function forwardPort(string $vmName, string $ruleName, int $hostPort, int $guestPort): void
+    {
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'modifyvm',
+            $vmName,
+            '--nat-pf1',
+            "$ruleName,tcp,127.0.0.1,$hostPort,,$guestPort",
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStderr());
+        }
+    }
+
     public function listVms(): array
     {
         $result = (new ShellRunner())->run([
