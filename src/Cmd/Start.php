@@ -19,8 +19,8 @@ class Start implements ICommand
             Utils::error('VM is already running!');
         }
 
-        $hypervisor->start($config->getName());
+        $hypervisor->start($config->getName(), in_array('--gui', $args));
 
-        Utils::outln('VM started!');
+        Utils::outln('VM starting...');
     }
 }

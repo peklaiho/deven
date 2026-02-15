@@ -152,14 +152,14 @@ class VirtualBox implements IHypervisor
         }
     }
 
-    public function start(string $vmName): void
+    public function start(string $vmName, bool $showGui = false): void
     {
         $result = (new ShellRunner())->run([
             'VBoxManage',
             'startvm',
             $vmName,
             '--type',
-            'headless',
+            ($showGui ? 'gui' : 'headless'),
         ]);
 
         if ($result->getStatus() !== 0) {
@@ -208,7 +208,7 @@ class VirtualBox implements IHypervisor
             'VBoxManage',
             'controlvm',
             $vmName,
-            'poweroff',
+            'acpipowerbutton',
         ]);
 
         if ($result->getStatus() !== 0) {
