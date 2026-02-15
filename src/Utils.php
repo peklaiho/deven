@@ -3,10 +3,27 @@ namespace PekLaiho\Deven;
 
 class Utils
 {
+    public static function copyFile(string $source, string $dest): void
+    {
+        self::outln("Copying file $source to $dest");
+
+        if (!is_readable($source)) {
+            self::error("Unable to read file $source");
+        } elseif (file_exists($dest)) {
+            self::error("File $file already exists");
+        }
+
+        if (!copy($source, $dest)) {
+            self::error("Unable to copy $source to $dest");
+        }
+    }
+
     // Create directory if it does not exist
     public static function createDir(string $dir, int $permissions = 0755): void
     {
         if (!is_dir($dir)) {
+            self::outln("Creating directory $dir");
+
             if (!mkdir($dir, 0755)) {
                 self::error("Unable to create directory: $dir");
             }

@@ -24,6 +24,7 @@ if (!$homeDir) {
 define('DEVEN_DIR', $homeDir . DIRECTORY_SEPARATOR . '.deven');
 define('DEVEN_IMAGE_DIR', DEVEN_DIR . DIRECTORY_SEPARATOR . 'images');
 define('DEVEN_TMP_DIR', DEVEN_DIR . DIRECTORY_SEPARATOR . 'tmp');
+define('DEVEN_VBOX_DIR', $homeDir . DIRECTORY_SEPARATOR . 'VirtualBox VMs');
 
 // Create directories if needed
 PekLaiho\Deven\Utils::createDir(DEVEN_DIR);

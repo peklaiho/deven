@@ -3,6 +3,20 @@ namespace PekLaiho\Deven;
 
 class VirtualBox implements IHypervisor
 {
+    const STORAGE_CONTROLLER_NAME = 'SATA';
+    const STORAGE_HARD_DISK_PORT = 0;
+    const STORAGE_DVD_DRIVE_PORT = 1;
+
+    public function attachHardDisk(string $vmName, string $file): void
+    {
+        $this->performStorageAttach($vmName, self::STORAGE_HARD_DISK_PORT, 'hdd', $file);
+    }
+
+    public function attachDvdDrive(string $vmName, string $file): void
+    {
+        $this->performStorageAttach($vmName, self::STORAGE_DVD_DRIVE_PORT, 'dvddrive', $file);
+    }
+
     public function convertRawImage(string $input, string $output): void
     {
         $result = (new ShellRunner())->run([
@@ -17,15 +31,17 @@ class VirtualBox implements IHypervisor
         }
     }
 
-    public function create(Config $config): void
+    public function create(string $vmName): void
     {
+        $osType = 'Debian13_64';
+
         $result = (new ShellRunner())->run([
             'VBoxManage',
             'createvm',
             '--name',
-            $config->getName(),
+            $vmName,
             '--ostype',
-            $config->getOsType(),
+            $osType,
             '--register',
         ]);
 
@@ -46,6 +62,16 @@ class VirtualBox implements IHypervisor
         if ($result->getStatus() !== 0) {
             Utils::error('Error: ' . $result->getStderr());
         }
+    }
+
+    public function detachHardDisk(string $vmName): void
+    {
+        $this->performStorageAttach($vmName, self::STORAGE_HARD_DISK_PORT, 'hdd', null);
+    }
+
+    public function detachDvdDrive(string $vmName): void
+    {
+        $this->performStorageAttach($vmName, self::STORAGE_DVD_DRIVE_PORT, 'dvddrive', null);
     }
 
     public function exists(string $vmName): bool
@@ -77,6 +103,53 @@ class VirtualBox implements IHypervisor
         }
 
         return $result;
+    }
+
+    public function resizeDisk(string $file, int $size): void
+    {
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'modifymedium',
+            'disk', $file,
+            '--resize', $size,
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStderr());
+        }
+    }
+
+    public function setCpusAndMemory(string $vmName, int $cpus, int $ram): void
+    {
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'modifyvm',
+            $vmName,
+            '--memory', $ram,
+            '--cpus', $cpus,
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStderr());
+        }
+    }
+
+    public function setupStorageController(string $vmName): void
+    {
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'storagectl',
+            $vmName,
+            '--name', self::STORAGE_CONTROLLER_NAME,
+            '--add', 'sata',
+            '--controller', 'IntelAhci',
+            '--portcount', 4,
+            '--bootable', 'on',
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStderr());
+        }
     }
 
     public function status(string $vmName): array
@@ -112,5 +185,23 @@ class VirtualBox implements IHypervisor
         }
 
         return $result;
+    }
+
+    private function performStorageAttach(string $vmName, int $port, string $type, ?string $file): void
+    {
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'storageattach',
+            $vmName,
+            '--storagectl', self::STORAGE_CONTROLLER_NAME,
+            '--device', 0,
+            '--port', $port,
+            '--type', $type,
+            '--medium', ($file ? $file : 'none'),
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStderr());
+        }
     }
 }
