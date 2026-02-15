@@ -26,8 +26,8 @@ class ConfigReader
 
         // Optional settings
 
-        if (array_key_exists('iso', $data)) {
-            $config->setIsoFile($data['iso']);
+        if (array_key_exists('image', $data)) {
+            $config->setImage($data['image']);
         }
 
         if (array_key_exists('cpus', $data)) {

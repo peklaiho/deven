@@ -3,6 +3,20 @@ namespace PekLaiho\Deven;
 
 class VirtualBox implements IHypervisor
 {
+    public function convertRawImage(string $input, string $output): void
+    {
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'convertfromraw',
+            $input,
+            $output,
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStderr());
+        }
+    }
+
     public function create(Config $config): void
     {
         $result = (new ShellRunner())->run([

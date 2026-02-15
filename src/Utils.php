@@ -13,9 +13,18 @@ class Utils
         }
     }
 
+    public static function debugLog(string $message): void
+    {
+        if (DEVEN_DEBUG) {
+            fwrite(STDERR, $message . PHP_EOL);
+        }
+    }
+
     // Die if not successful
     public static function deleteFile(string $file): void
     {
+        self::outln("Deleting file $file");
+
         if (!unlink($file)) {
             self::error("Unable to delete file $file");
         }
@@ -23,7 +32,11 @@ class Utils
 
     public static function downloadFile(string $url, string $file): void
     {
-        self::outln("Downloading file $url");
+        self::outln("Downloading $url to $file");
+
+        if (file_exists($file)) {
+            self::error("File $file already exists");
+        }
 
         $runner = new ShellRunner();
         $result = $runner->run([
@@ -46,10 +59,15 @@ class Utils
     {
         self::outln("Extracting $fileInArchive from $archive to $outputFile");
 
+        if (file_exists($outputFile)) {
+            self::error("File $outputFile already exists");
+        }
+
         $cmd = [
             'tar', '--extract',
             '--file', $archive,
-            '--to-stdout',
+            '--absolute-names',
+            '--transform', "s,disk.raw,$outputFile,",
         ];
 
         if (str_ends_with($archive, '.xz')) {
@@ -59,8 +77,6 @@ class Utils
         }
 
         $cmd[] = $fileInArchive;
-        $cmd[] = '>';
-        $cmd[] = $outputFile;
 
         $runner = new ShellRunner();
         $result = $runner->run($cmd);

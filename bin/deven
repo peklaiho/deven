@@ -2,6 +2,9 @@
 <?php
 require(__DIR__ . '/../vendor/autoload.php');
 
+// Debug mode: more verbose output
+define('DEVEN_DEBUG', true);
+
 // If no arguments, show help and exit
 if ($argc < 2) {
     PekLaiho\Deven\Utils::outln('Available commands:');
@@ -36,9 +39,6 @@ if (!$configFile) {
 
 $configReader = new PekLaiho\Deven\ConfigReader();
 $config = $configReader->read($configFile);
-
-$runner = new PekLaiho\Deven\ShellRunner();
-$result = $runner->run(['sleep', '1']);
 
 $hypervisor = new PekLaiho\Deven\VirtualBox();
 

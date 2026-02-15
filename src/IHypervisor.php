@@ -3,6 +3,7 @@ namespace PekLaiho\Deven;
 
 interface IHypervisor
 {
+    public function convertRawImage(string $input, string $output): void;
     public function create(Config $config): void;
     public function destroy(string $vmName): void;
     public function exists(string $vmName): bool;

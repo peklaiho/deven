@@ -34,44 +34,56 @@ class Image implements ICommand
 
     public function cmdDownload(IHypervisor $hypervisor, Config $config, array $args): void
     {
-        $targetFile = DEVEN_IMAGE_DIR . DIRECTORY_SEPARATOR . 'debian-13-generic-amd64.vdi';
+        // Base name of the image file
+        $base = $config->getImage();
 
-        if (file_exists($targetFile)) {
-            Utils::error("File $targetFile already exists, no need to download");
-        }
-
-        // First download the raw image if we don't have it yet
-
-        $imageUrl = 'https://cdimage.debian.org/images/cloud/trixie/latest/debian-13-generic-amd64.tar.xz';
-        $hashUrl = 'https://cloud.debian.org/images/cloud/trixie/latest/SHA512SUMS';
-
-        $imageFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'debian-13-generic-amd64.tar.xz';
+        // Filenames
+        $targetFile = DEVEN_IMAGE_DIR . DIRECTORY_SEPARATOR . "$base.vdi";
+        $archiveFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . "$base.tar.xz";
+        $rawFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . "$base.raw";
         $hashFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'SHA512SUMS';
 
-        if (!file_exists($imageFile)) {
-            Utils::downloadFile($imageUrl, $imageFile);
-        }
-        if (!file_exists($hashFile)) {
-            Utils::downloadFile($hashUrl, $hashFile);
+        // Check if target file already exists
+        if (file_exists($targetFile)) {
+            Utils::error("Image $base already exists");
         }
 
-        // Then verify the hash
+        // Download the archive
+        $archiveUrl = "https://cdimage.debian.org/images/cloud/trixie/latest/$base.tar.xz";
+        $hashUrl = 'https://cloud.debian.org/images/cloud/trixie/latest/SHA512SUMS';
 
+        Utils::downloadFile($archiveUrl, $archiveFile);
+        Utils::downloadFile($hashUrl, $hashFile);
+
+        // Verify the hash
         $hashes = Utils::readHashFile($hashFile);
-        Utils::verifyHash($imageFile, $hashes['debian-13-generic-amd64.tar.xz']);
+        Utils::verifyHash($archiveFile, $hashes["$base.tar.xz"]);
 
-        // Extract the archive if needed
+        // Extract the raw file from archive
+        Utils::extractFileFromArchive($archiveFile, 'disk.raw', $rawFile);
 
-        $rawFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'debian-13-generic-amd64.raw';
+        // Convert the raw file into VDI format
+        $hypervisor->convertRawImage($rawFile, $targetFile);
 
-        if (!file_exists($rawFile)) {
-            Utils::extractFileFromArchive($imageFile, 'disk.raw', $rawFile);
-        }
+        // Delete the temporary files
+        Utils::deleteFile($rawFile);
+        Utils::deleteFile($archiveFile);
+        Utils::deleteFile($hashFile);
 
+        Utils::outln("Image $base was downloaded successfully!");
     }
 
     public function cmdList(IHypervisor $hypervisor, Config $config, array $args): void
     {
-        // TODO
+        $images = glob(DEVEN_IMAGE_DIR . DIRECTORY_SEPARATOR . '*.vdi');
+
+        if (empty($images)) {
+            Utils::outln("No images!");
+            return;
+        }
+
+        foreach ($images as $name) {
+            Utils::outln(substr(basename($name), 0, -4));
+        }
     }
 }

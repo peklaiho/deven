@@ -3,8 +3,8 @@ namespace PekLaiho\Deven;
 
 class Config
 {
-    protected ?string $isoFile = null;
-    protected int $cpus = 1;
+    protected string $image = 'debian-13-generic-amd64';
+    protected int $cpus = 2;
     protected int $ram = 8; // GB
     protected int $disk = 32; // GB
 
@@ -29,14 +29,14 @@ class Config
         return $this->dir;
     }
 
-    public function getIsoFile(): ?string
+    public function getImage(): string
     {
-        return $this->isoFile;
+        return $this->image;
     }
 
-    public function setIsoFile(?string $value): void
+    public function setImage(?string $value): void
     {
-        $this->isoFile = $value;
+        $this->image = $value;
     }
 
     public function getCpus(): int

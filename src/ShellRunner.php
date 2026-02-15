@@ -5,6 +5,8 @@ class ShellRunner
 {
     public function run(array $command): ShellResult
     {
+        Utils::debugLog('Run: ' . implode(' ', $command));
+
         $startTime = microtime(true);
 
         $descriptorspec = [

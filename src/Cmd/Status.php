@@ -18,7 +18,7 @@ class Status implements ICommand
         // Special formats
         if (in_array('--json', $args)) {
             Utils::outln(json_encode($status, JSON_PRETTY_PRINT));
-            exit(0);
+            return;
         }
 
         // Default: Just show if it is running or not
