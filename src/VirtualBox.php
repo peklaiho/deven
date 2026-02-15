@@ -152,6 +152,21 @@ class VirtualBox implements IHypervisor
         }
     }
 
+    public function start(string $vmName): void
+    {
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'startvm',
+            $vmName,
+            '--type',
+            'headless',
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStderr());
+        }
+    }
+
     public function status(string $vmName): array
     {
         $result = (new ShellRunner())->run([
@@ -185,6 +200,20 @@ class VirtualBox implements IHypervisor
         }
 
         return $result;
+    }
+
+    public function stop(string $vmName): void
+    {
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'controlvm',
+            $vmName,
+            'poweroff',
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStderr());
+        }
     }
 
     private function performStorageAttach(string $vmName, int $port, string $type, ?string $file): void

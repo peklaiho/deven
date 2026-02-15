@@ -15,5 +15,7 @@ interface IHypervisor
     public function resizeDisk(string $file, int $size): void;
     public function setCpusAndMemory(string $vmName, int $cpus, int $ram): void;
     public function setupStorageController(string $vmName): void;
+    public function start(string $vmName): void;
     public function status(string $vmName): array;
+    public function stop(string $vmName): void;
 }

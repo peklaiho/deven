@@ -11,7 +11,9 @@ if ($argc < 2) {
     PekLaiho\Deven\Utils::outln('create');
     PekLaiho\Deven\Utils::outln('destroy');
     PekLaiho\Deven\Utils::outln('image');
+    PekLaiho\Deven\Utils::outln('start');
     PekLaiho\Deven\Utils::outln('status');
+    PekLaiho\Deven\Utils::outln('stop');
     exit(0);
 }
 
@@ -47,7 +49,9 @@ $commandMap = [
     'create' => new PekLaiho\Deven\Cmd\Create(),
     'destroy' => new PekLaiho\Deven\Cmd\Destroy(),
     'image' => new PekLaiho\Deven\Cmd\Image(),
+    'start' => new PekLaiho\Deven\Cmd\Start(),
     'status' => new PekLaiho\Deven\Cmd\Status(),
+    'stop' => new PekLaiho\Deven\Cmd\Stop(),
 ];
 
 $command = null;
