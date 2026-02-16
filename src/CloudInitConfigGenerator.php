@@ -1,31 +1,52 @@
 <?php
 namespace PekLaiho\Deven;
 
+use Symfony\Component\Yaml\Yaml;
+
 class CloudInitConfigGenerator
 {
     public function makeMetaData(string $instanceId, string $hostname): string
     {
-        return <<<EOF
-instance-id: $instanceId
-local-hostname: $hostname
+        $data = [
+            'instance-id' => $instanceId,
+            'local-hostname' => $hostname,
+        ];
 
-EOF;
+        return Yaml::dump($data);
     }
 
-    public function makeUserData(string $hostname, string $sshPublicKey): string
+    public function makeUserData(string $hostname, SshKey $hostKey, SshKey $userKey): string
     {
-        return <<<EOF
-hostname: $hostname
-users:
-  - name: deven
-    sudo: ALL=(ALL) NOPASSWD:ALL
-    groups: sudo
-    shell: /bin/bash
-    ssh_authorized_keys:
-      - $sshPublicKey
-package_update: true
-package_upgrade: true
+        $hostPublic = $hostKey->getPublicKey();
+        $hostPrivate = $hostKey->getPrivateKey();
+        $userPublic = $userKey->getPublicKey();
 
-EOF;
+        $data = [
+            'hostname' => $hostname,
+            'ssh_keys' => [
+                'ed25519_private' => $hostPrivate,
+                'ed25519_public' => $hostPublic,
+            ],
+            'users' => [
+                [
+                    'name' => 'deven',
+                    'sudo' => 'ALL=(ALL) NOPASSWD:ALL',
+                    'groups' => 'sudo',
+                    'shell' => '/bin/bash',
+                    'plain_text_passwd' => 'deven',
+                    'lock_passwd' => false,
+                    'ssh_authorized_keys' => [ $userPublic ],
+                ]
+            ],
+            'chpasswd' => [
+                'expire' => false,
+            ],
+            'package_update' => true,
+            'package_upgrade' => true,
+        ];
+
+        $header = "#cloud-config\n";
+
+        return $header . Yaml::dump($data);
     }
 }

@@ -1,2 +1,2 @@
 #!/bin/sh
-exec ssh -v -i ~/.deven/ssh-key -p 2222 deven@127.0.0.1
+exec ssh -i ~/.deven/ssh-user-key -p 2222 deven@127.0.0.1 "$@"

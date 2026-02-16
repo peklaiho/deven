@@ -3,21 +3,19 @@ namespace PekLaiho\Deven;
 
 class SshKeyManager
 {
-    public function getPublicKey(): string
+    public function getHostKey(): SshKey
     {
-        $keys = $this->getKeys();
-        return $keys['public'];
+        return $this->getKey('ssh-host-key');
     }
 
-    public function getPrivateKey(): string
+    public function getUserKey(): SshKey
     {
-        $keys = $this->getKeys();
-        return $keys['private'];
+        return $this->getKey('ssh-user-key');
     }
 
-    private function getKeys(): array
+    private function getKey(string $name): SshKey
     {
-        $keyFile = DEVEN_DIR . DIRECTORY_SEPARATOR . 'ssh-key';
+        $keyFile = DEVEN_DIR . DIRECTORY_SEPARATOR . $name;
 
         if (!file_exists($keyFile)) {
             $result = (new ShellRunner())->run([
@@ -31,9 +29,9 @@ class SshKeyManager
             }
         }
 
-        return [
-            'public' => trim(file_get_contents($keyFile . '.pub')),
-            'private' => trim(file_get_contents($keyFile)),
-        ];
+        return new SshKey(
+            file_get_contents($keyFile . '.pub'),
+            file_get_contents($keyFile)
+        );
     }
 }

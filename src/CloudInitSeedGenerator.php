@@ -12,8 +12,9 @@ class CloudInitSeedGenerator
             Utils::error("File $targetFile already exists");
         }
 
-        // Get or create SSH key
-        $sshPublicKey = (new SshKeyManager())->getPublicKey();
+        // Get or create SSH keys
+        $hostKey = (new SshKeyManager())->getHostKey();
+        $userKey = (new SshKeyManager())->getUserKey();
 
         // Create metadata and userdata files
         $configGen = new CloudInitConfigGenerator();
@@ -21,8 +22,8 @@ class CloudInitSeedGenerator
         $metaDataFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'meta-data';
         $userDataFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'user-data';
 
-        Utils::writeFile($metaDataFile, $configGen->makeMetaData($name, $name));
-        Utils::writeFile($userDataFile, $configGen->makeUserData($name, $sshPublicKey));
+        Utils::writeFile($metaDataFile, $configGen->makeMetaData("deven-$name", $name));
+        Utils::writeFile($userDataFile, $configGen->makeUserData($name, $hostKey, $userKey));
 
         // Create the ISO
         $result = (new ShellRunner())->run([
