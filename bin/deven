@@ -46,8 +46,10 @@ $config = $configReader->read($configFile);
 $hypervisor = new PekLaiho\Deven\VirtualBox();
 
 $commandMap = [
+    'attach' => new PekLaiho\Deven\Cmd\Attach(),
     'create' => new PekLaiho\Deven\Cmd\Create(),
     'destroy' => new PekLaiho\Deven\Cmd\Destroy(),
+    'detach' => new PekLaiho\Deven\Cmd\Detach(),
     'image' => new PekLaiho\Deven\Cmd\Image(),
     'start' => new PekLaiho\Deven\Cmd\Start(),
     'status' => new PekLaiho\Deven\Cmd\Status(),
