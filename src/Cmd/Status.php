@@ -29,5 +29,16 @@ class Status implements ICommand
         } else {
             Utils::outln('VM state: ' . $status['VMState']);
         }
+
+        // Show attacked image
+        Utils::outln('ISO: ' . $status['SATA-1-0']);
+
+        // Show forwarded ports
+        foreach ($status as $key => $val) {
+            if (str_starts_with($key, 'Forwarding')) {
+                $parts = explode(',', $val);
+                Utils::outln('Port: ' . $parts[3] . ' -> ' . $parts[5] . ' (' . $parts[0] . ')');
+            }
+        }
     }
 }
