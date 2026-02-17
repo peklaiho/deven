@@ -9,16 +9,22 @@ class VirtualBox implements IHypervisor
 
     public function attachHardDisk(string $vmName, string $file): void
     {
+        Utils::outln("Attaching hard disk to $file");
+
         $this->performStorageAttach($vmName, self::STORAGE_HARD_DISK_PORT, 'hdd', $file);
     }
 
     public function attachDvdDrive(string $vmName, string $file): void
     {
+        Utils::outln("Attaching DVD drive to $file");
+
         $this->performStorageAttach($vmName, self::STORAGE_DVD_DRIVE_PORT, 'dvddrive', $file);
     }
 
     public function convertRawImage(string $input, string $output): void
     {
+        Utils::outln("Converting image $input to $output");
+
         $result = (new ShellRunner())->run([
             'VBoxManage',
             'convertfromraw',
@@ -66,11 +72,15 @@ class VirtualBox implements IHypervisor
 
     public function detachHardDisk(string $vmName): void
     {
+        Utils::outln("Detaching hard disk");
+
         $this->performStorageAttach($vmName, self::STORAGE_HARD_DISK_PORT, 'hdd', null);
     }
 
     public function detachDvdDrive(string $vmName): void
     {
+        Utils::outln("Detaching DVD image");
+
         $this->performStorageAttach($vmName, self::STORAGE_DVD_DRIVE_PORT, 'dvddrive', null);
     }
 
@@ -81,6 +91,8 @@ class VirtualBox implements IHypervisor
 
     public function forwardPort(string $vmName, string $ruleName, int $hostPort, int $guestPort): void
     {
+        Utils::outln("NAT: Forward host port $hostPort to guest port $guestPort");
+
         $result = (new ShellRunner())->run([
             'VBoxManage',
             'modifyvm',
@@ -122,6 +134,8 @@ class VirtualBox implements IHypervisor
 
     public function resizeDisk(string $file, int $size): void
     {
+        Utils::outln("Resize disk image $file to $size MB");
+
         $result = (new ShellRunner())->run([
             'VBoxManage',
             'modifymedium',
@@ -136,6 +150,8 @@ class VirtualBox implements IHypervisor
 
     public function setCpusAndMemory(string $vmName, int $cpus, int $ram): void
     {
+        Utils::outln("Setting CPUs to $cpus and RAM to $ram MB");
+
         $result = (new ShellRunner())->run([
             'VBoxManage',
             'modifyvm',
@@ -151,6 +167,8 @@ class VirtualBox implements IHypervisor
 
     public function setupStorageController(string $vmName): void
     {
+        Utils::outln('Setting up storage controller: ' . self::STORAGE_CONTROLLER_NAME);
+
         $result = (new ShellRunner())->run([
             'VBoxManage',
             'storagectl',
@@ -169,6 +187,8 @@ class VirtualBox implements IHypervisor
 
     public function start(string $vmName, bool $showGui = false): void
     {
+        Utils::outln('Starting VM...');
+
         $result = (new ShellRunner())->run([
             'VBoxManage',
             'startvm',
@@ -219,6 +239,8 @@ class VirtualBox implements IHypervisor
 
     public function stop(string $vmName): void
     {
+        Utils::outln('Shutting down VM...');
+
         $result = (new ShellRunner())->run([
             'VBoxManage',
             'controlvm',

@@ -20,7 +20,5 @@ class Stop implements ICommand
         }
 
         $hypervisor->stop($config->getName());
-
-        Utils::outln('VM shutting down...');
     }
 }

@@ -20,7 +20,5 @@ class Start implements ICommand
         }
 
         $hypervisor->start($config->getName(), in_array('--gui', $args));
-
-        Utils::outln('VM starting...');
     }
 }
