@@ -20,5 +20,6 @@ class Stop implements ICommand
         }
 
         $hypervisor->stop($config->getName());
+        $hypervisor->waitForStatus($config->getName(), 'poweroff');
     }
 }

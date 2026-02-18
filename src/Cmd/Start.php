@@ -20,5 +20,6 @@ class Start implements ICommand
         }
 
         $hypervisor->start($config->getName(), in_array('--gui', $args));
+        $hypervisor->waitForStatus($config->getName(), 'running');
     }
 }

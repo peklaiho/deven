@@ -19,4 +19,5 @@ interface IHypervisor
     public function start(string $vmName, bool $showGui = false): void;
     public function status(string $vmName): array;
     public function stop(string $vmName): void;
+    public function waitForStatus(string $vmName, string $status, int $interval = 1): void;
 }

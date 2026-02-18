@@ -253,6 +253,21 @@ class VirtualBox implements IHypervisor
         }
     }
 
+    public function waitForStatus(string $vmName, string $status, int $interval = 1): void
+    {
+        Utils::debugLog("Waiting for status: $status");
+
+        while (true) {
+            $s = $this->status($vmName);
+
+            if ($s['VMState'] == $status) {
+                return;
+            }
+
+            sleep($interval);
+        }
+    }
+
     private function performStorageAttach(string $vmName, int $port, string $type, ?string $file): void
     {
         $result = (new ShellRunner())->run([

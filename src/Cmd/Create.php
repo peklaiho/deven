@@ -2,8 +2,10 @@
 namespace PekLaiho\Deven\Cmd;
 
 use PekLaiho\Deven\CloudInitSeedGenerator;
+use PekLaiho\Deven\CloudInitStatus;
 use PekLaiho\Deven\Config;
 use PekLaiho\Deven\IHypervisor;
+use PekLaiho\Deven\SshRunner;
 use PekLaiho\Deven\Utils;
 
 class Create implements ICommand
@@ -41,6 +43,31 @@ class Create implements ICommand
         $seedFile = $seedGen->make($name);
         $hypervisor->attachDvdDrive($name, $seedFile);
 
+        // Start her up
+        $hypervisor->start($name);
+        $hypervisor->waitForStatus($name, 'running');
+
+        // Wait for SSH connection
+        $sshRunner = new SshRunner();
+        $sshRunner->waitForSshConnection($name);
+
+        // Wait for cloud-init to complete
+        $cloudInitStatus = new CloudInitStatus();
+        $cloudInitStatus->waitForCompletion($name);
+
+        // Shutdown the machine
+        $sshRunner->run($name, ['sudo', 'shutdown', 'now']);
+        $hypervisor->waitForStatus($name, 'poweroff');
+
+        // Detach the seed ISO and delete it
+        $hypervisor->detachDvdDrive($name);
+        Utils::deleteFile($seedFile);
+
+        // Start the machine again
+        $hypervisor->start($name);
+        $hypervisor->waitForStatus($name, 'running');
+
+        // We are done!
         Utils::outln('VM created successfully!');
     }
 }
