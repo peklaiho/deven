@@ -65,11 +65,14 @@ class Utils
         }
     }
 
-    // Write error to stderr and exit
+    // Write error to stderr. Exit, unless $status < 0
     public static function error(string $message, int $status = 1): void
     {
         fwrite(STDERR, $message . PHP_EOL);
-        exit($status);
+
+        if ($status >= 0) {
+            exit($status);
+        }
     }
 
     public static function extractFileFromArchive(string $archive, string $fileInArchive, string $outputFile): void
@@ -163,9 +166,9 @@ class Utils
         }
     }
 
-    public static function writeFile(string $file, string $data): void
+    public static function writeFile(string $file, string $data, bool $overwrite = false): void
     {
-        if (file_exists($file)) {
+        if (!$overwrite && file_exists($file)) {
             self::error("File $file already exists");
         }
 

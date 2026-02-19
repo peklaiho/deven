@@ -3,10 +3,15 @@ namespace PekLaiho\Deven;
 
 class CloudInitStatus
 {
+    public function __construct(
+        protected SshRunner $sshRunner
+    ) {
+
+    }
+
     public function getStatus(string $vmName): string
     {
-        $runner = new SshRunner();
-        $result = $runner->run($vmName, ['cloud-init', 'status']);
+        $result = $this->sshRunner->run($vmName, ['cloud-init', 'status']);
 
         if ($result->getStatus() === 0) {
             $parts = explode(':', $result->getStdout());

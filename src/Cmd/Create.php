@@ -6,6 +6,7 @@ use PekLaiho\Deven\CloudInitStatus;
 use PekLaiho\Deven\Config;
 use PekLaiho\Deven\IHypervisor;
 use PekLaiho\Deven\SshRunner;
+use PekLaiho\Deven\TermInfoInstaller;
 use PekLaiho\Deven\Utils;
 
 class Create implements ICommand
@@ -29,8 +30,7 @@ class Create implements ICommand
         $hypervisor->setupStorageController($name);
 
         // Configure NAT port forwarding
-        $hypervisor->forwardPort($name, 'ssh', 2222, 22);
-        $hypervisor->forwardPort($name, 'http', 8080, 80);
+        $hypervisor->forwardPort($name, 'ssh', $config->getSshPort(), 22);
 
         // Copy the image for hard disk, resize and attach
         $hardDiskFile = DEVEN_VBOX_DIR . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR . "$name.vdi";
@@ -48,12 +48,16 @@ class Create implements ICommand
         $hypervisor->waitForStatus($name, 'running');
 
         // Wait for SSH connection
-        $sshRunner = new SshRunner();
+        $sshRunner = new SshRunner($config->getSshPort());
         $sshRunner->waitForSshConnection($name);
 
         // Wait for cloud-init to complete
-        $cloudInitStatus = new CloudInitStatus();
+        $cloudInitStatus = new CloudInitStatus($sshRunner);
         $cloudInitStatus->waitForCompletion($name);
+
+        // Install terminfo if needed
+        $termInfo = new TermInfoInstaller($sshRunner);
+        $termInfo->install($name);
 
         // Shutdown the machine
         $sshRunner->run($name, ['sudo', 'shutdown', 'now']);

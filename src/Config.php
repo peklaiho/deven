@@ -64,4 +64,9 @@ class Config
     {
         $this->disk = $value;
     }
+
+    public function getSshPort(): int
+    {
+        return 2222;
+    }
 }
