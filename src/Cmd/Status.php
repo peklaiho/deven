@@ -37,8 +37,14 @@ class Status implements ICommand
         foreach ($status as $key => $val) {
             if (str_starts_with($key, 'Forwarding')) {
                 $parts = explode(',', $val);
-                Utils::outln('Port: ' . $parts[3] . ' -> ' . $parts[5] . ' (' . $parts[0] . ')');
+                Utils::outln('Port: ' . $parts[3] . ' -> ' . $parts[5]);
             }
+        }
+
+        // Show shared directory
+        $shareDir = $status['SharedFolderPathMachineMapping1'] ?? null;
+        if ($shareDir) {
+            Utils::outln("Shared dir: $shareDir -> /deven");
         }
     }
 }

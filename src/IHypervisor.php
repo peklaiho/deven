@@ -3,6 +3,7 @@ namespace PekLaiho\Deven;
 
 interface IHypervisor
 {
+    public function addSharedFolder(string $vmName, string $shareName, string $hostDir);
     public function attachHardDisk(string $vmName, string $file): void;
     public function attachDvdDrive(string $vmName, string $file): void;
     public function convertRawImage(string $input, string $output): void;

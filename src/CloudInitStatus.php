@@ -21,7 +21,7 @@ class CloudInitStatus
         Utils::error('Unable to read cloud-init status: ' . $result->getStderr());
     }
 
-    public function waitForCompletion(string $vmName, int $delay = 5): void
+    public function waitForCompletion(string $vmName, int $delay = 10): void
     {
         Utils::outln('Waiting for cloud-init to complete...');
 

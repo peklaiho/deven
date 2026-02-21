@@ -7,6 +7,23 @@ class VirtualBox implements IHypervisor
     const STORAGE_HARD_DISK_PORT = 0;
     const STORAGE_DVD_DRIVE_PORT = 1;
 
+    public function addSharedFolder(string $vmName, string $shareName, string $hostDir)
+    {
+        Utils::outln("Adding shared directory $shareName: $hostDir");
+
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'sharedfolder',
+            'add', $vmName,
+            '--name', $shareName,
+            '--hostpath', $hostDir,
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStderr());
+        }
+    }
+
     public function attachHardDisk(string $vmName, string $file): void
     {
         Utils::outln("Attaching hard disk to $file");
