@@ -42,6 +42,10 @@ class ConfigReader
             $config->setDisk($data['disk']);
         }
 
+        if (array_key_exists('ports', $data)) {
+            $config->setPorts($data['ports']);
+        }
+
         return $config;
     }
 }

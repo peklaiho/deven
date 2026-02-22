@@ -9,7 +9,7 @@ class SshRunner
 
     }
 
-    public function copyFile(string $vmName, string $hostFilename, string $guestFilename): bool
+    public function copyFile(string $vmName, string $hostFilename, string $guestFilename): void
     {
         if (!is_readable($hostFilename)) {
             Utils::error("Unable to read file $hostFilename");
@@ -26,11 +26,8 @@ class SshRunner
         ]);
 
         if ($result->getStatus() !== 0) {
-            Utils::error("Unable copy file $hostFilename to VM: " . $result->getStdErr(), -1);
-            return false;
+            Utils::error("Unable copy file $hostFilename to VM: " . $result->getStdErr());
         }
-
-        return true;
     }
 
     public function run(string $vmName, array $command): ShellResult

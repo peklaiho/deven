@@ -1,1 +1,24 @@
+# Example configuration file for a Deven app.
+# All other settings except `name` are optional
+# and have sensible defaults.
+
+# Name of the app / VM
 name: my-app
+
+# Name of the image
+image: debian-13-generic-amd64
+
+# Number of CPUs
+cpus: 2
+
+# Amount of RAM in GB
+ram: 8
+
+# Disk size in GB
+disk: 32
+
+# Forwarded ports (host: guest)
+# SSH defaults to 2222 if not listed.
+ports:
+  2222: 22
+  8080: 80

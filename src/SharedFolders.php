@@ -36,6 +36,7 @@ class SharedFolders
         // Install the systemd mount file
         $mountFile = $this->createMountFile();
         $this->sshRunner->copyFile($vmName, $mountFile, '~/deven.mount');
+        Utils::deleteFile($mountFile);
 
         $result = $this->sshRunner->run($vmName, ['sudo', 'mv', '~/deven.mount', '/etc/systemd/system/deven.mount']);
         if ($result->getStatus() !== 0) {

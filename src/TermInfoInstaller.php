@@ -1,9 +1,7 @@
 <?php
 namespace PekLaiho\Deven;
 
-// Install terminfo on the guest if needed.
-// This is sort of secondary functionality so
-// do not die on errors here, just log failures.
+// Install terminfo on the guest if needed
 class TermInfoInstaller
 {
     public function __construct(
@@ -17,8 +15,7 @@ class TermInfoInstaller
         $term = getenv('TERM');
 
         if (!$term) {
-            Utils::error('Unable to read terminal type', -1);
-            return;
+            Utils::error('Unable to read terminal type');
         }
 
         // Check if it already known on guest
@@ -37,8 +34,7 @@ class TermInfoInstaller
         ]);
 
         if ($result->getStatus() !== 0) {
-            Utils::error('Unable to read terminfo using infocmp: ' . $result->getStdErr(), -1);
-            return;
+            Utils::error('Unable to read terminfo using infocmp: ' . $result->getStdErr());
         }
 
         // Save it to a temporary file
@@ -46,9 +42,7 @@ class TermInfoInstaller
         Utils::writeFile($tempFile, $result->getStdOut(), true);
 
         // Copy it over
-        if (!$this->sshRunner->copyFile($vmName, $tempFile, "~/$term.ti")) {
-            return;
-        }
+        $this->sshRunner->copyFile($vmName, $tempFile, "~/$term.ti");
 
         // Apply it to the guest
         $result = $this->sshRunner->run($vmName, [
@@ -56,18 +50,18 @@ class TermInfoInstaller
         ]);
 
         if ($result->getStatus() !== 0) {
-            Utils::error('Unable to install terminfo on VM: ' . $result->getStdErr(), -1);
-            return;
+            Utils::error('Unable to install terminfo on VM: ' . $result->getStdErr());
         }
 
-        // Finally delete the file
+        // Finally delete both files
+        Utils::deleteFile($tempFile);
+
         $result = $this->sshRunner->run($vmName, [
             'rm', "~/$term.ti"
         ]);
 
         if ($result->getStatus() !== 0) {
-            Utils::error('Unable to clean up terminfo file on VM: ' . $result->getStdErr(), -1);
-            return;
+            Utils::error('Unable to clean up terminfo file on VM: ' . $result->getStdErr());
         }
 
         Utils::outln("Terminfo for $term installed successfully on VM");
