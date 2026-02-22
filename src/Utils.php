@@ -61,7 +61,7 @@ class Utils
         ]);
 
         if ($result->getStatus() !== 0) {
-            self::error("Download of $url to $file failed: " . $result->getStderr());
+            self::error("Download of $url to $file failed: " . $result->getStdErr());
         }
     }
 
@@ -102,7 +102,7 @@ class Utils
         $result = $runner->run($cmd);
 
         if ($result->getStatus() !== 0) {
-            self::error("Unable to extract $fileInArchive from $archive: " . $result->getStderr());
+            self::error("Unable to extract $fileInArchive from $archive: " . $result->getStdErr());
         }
     }
 
@@ -156,10 +156,10 @@ class Utils
         $result = $runner->run(['sha512sum', $file]);
 
         if ($result->getStatus() !== 0) {
-            self::error("Unable to calculate hash for file $file: " . $result->getStderr());
+            self::error("Unable to calculate hash for file $file: " . $result->getStdErr());
         }
 
-        $parts = preg_split('/\s+/', trim($result->getStdout()), -1, PREG_SPLIT_NO_EMPTY);
+        $parts = preg_split('/\s+/', trim($result->getStdOut()), -1, PREG_SPLIT_NO_EMPTY);
 
         if ($parts[0] !== $correctHash) {
             self::error("Hash for file $file does not match");

@@ -37,13 +37,13 @@ class TermInfoInstaller
         ]);
 
         if ($result->getStatus() !== 0) {
-            Utils::error('Unable to read terminfo using infocmp: ' . $result->getStderr(), -1);
+            Utils::error('Unable to read terminfo using infocmp: ' . $result->getStdErr(), -1);
             return;
         }
 
         // Save it to a temporary file
         $tempFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . "$term.ti";
-        Utils::writeFile($tempFile, $result->getStdout(), true);
+        Utils::writeFile($tempFile, $result->getStdOut(), true);
 
         // Copy it over
         if (!$this->sshRunner->copyFile($vmName, $tempFile, "~/$term.ti")) {
@@ -56,7 +56,7 @@ class TermInfoInstaller
         ]);
 
         if ($result->getStatus() !== 0) {
-            Utils::error('Unable to install terminfo on VM: ' . $result->getStderr(), -1);
+            Utils::error('Unable to install terminfo on VM: ' . $result->getStdErr(), -1);
             return;
         }
 
@@ -66,7 +66,7 @@ class TermInfoInstaller
         ]);
 
         if ($result->getStatus() !== 0) {
-            Utils::error('Unable to clean up terminfo file on VM: ' . $result->getStderr(), -1);
+            Utils::error('Unable to clean up terminfo file on VM: ' . $result->getStdErr(), -1);
             return;
         }
 

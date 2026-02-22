@@ -26,7 +26,7 @@ class SshRunner
         ]);
 
         if ($result->getStatus() !== 0) {
-            Utils::error("Unable copy file $hostFilename to VM: " . $result->getStderr(), -1);
+            Utils::error("Unable copy file $hostFilename to VM: " . $result->getStdErr(), -1);
             return false;
         }
 
@@ -55,7 +55,7 @@ class SshRunner
                 return;
             }
 
-            Utils::debugLog('SSH error: ' . $result->getStatus() . ' ' . $result->getStderr());
+            Utils::debugLog('SSH error: ' . $result->getStatus() . ' ' . $result->getStdErr());
 
             sleep($delay);
         }

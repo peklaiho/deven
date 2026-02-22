@@ -17,12 +17,12 @@ class ShellResult
         return $this->status;
     }
 
-    public function getStdout(): string
+    public function getStdOut(): string
     {
         return $this->stdout;
     }
 
-    public function getStderr(): string
+    public function getStdErr(): string
     {
         return $this->stderr;
     }

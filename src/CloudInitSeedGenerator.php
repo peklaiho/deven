@@ -44,7 +44,7 @@ class CloudInitSeedGenerator
         ]);
 
         if ($result->getStatus() !== 0) {
-            Utils::error("Unable to create ISO file $targetFile: " . $result->getStderr());
+            Utils::error("Unable to create ISO file $targetFile: " . $result->getStdErr());
         }
 
         // Delete temporary files

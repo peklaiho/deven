@@ -25,7 +25,7 @@ class SshKeyManager
             ]);
 
             if ($result->getStatus() !== 0) {
-                Utils::error('Unable to generate SSH key: ' . $result->getStderr());
+                Utils::error('Unable to generate SSH key: ' . $result->getStdErr());
             }
         }
 

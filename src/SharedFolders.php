@@ -24,13 +24,13 @@ class SharedFolders
         // Add user to vboxsf group
         $result = $this->sshRunner->run($vmName, ['sudo', 'usermod', '-aG', 'vboxsf', 'deven']);
         if ($result->getStatus() !== 0) {
-            Utils::error('Unable to add user to vboxsf group: ' . $result->getStderr());
+            Utils::error('Unable to add user to vboxsf group: ' . $result->getStdErr());
         }
 
         // Create the mount dir
         $result = $this->sshRunner->run($vmName, ['sudo', 'mkdir', '-p', '/deven']);
         if ($result->getStatus() !== 0) {
-            Utils::error('Unable to create shared directory: ' . $result->getStderr());
+            Utils::error('Unable to create shared directory: ' . $result->getStdErr());
         }
 
         // Install the systemd mount file
@@ -39,17 +39,17 @@ class SharedFolders
 
         $result = $this->sshRunner->run($vmName, ['sudo', 'mv', '~/deven.mount', '/etc/systemd/system/deven.mount']);
         if ($result->getStatus() !== 0) {
-            Utils::error('Unable to copy systemd mount file: ' . $result->getStderr());
+            Utils::error('Unable to copy systemd mount file: ' . $result->getStdErr());
         }
 
         $result = $this->sshRunner->run($vmName, ['sudo', 'chown', 'root:root', '/etc/systemd/system/deven.mount']);
         if ($result->getStatus() !== 0) {
-            Utils::error('Unable to set ownership for systemd mount file: ' . $result->getStderr());
+            Utils::error('Unable to set ownership for systemd mount file: ' . $result->getStdErr());
         }
 
         $result = $this->sshRunner->run($vmName, ['sudo', 'systemctl', 'enable', 'deven.mount']);
         if ($result->getStatus() !== 0) {
-            Utils::error('Unable to enable systemd mount: ' . $result->getStderr());
+            Utils::error('Unable to enable systemd mount: ' . $result->getStdErr());
         }
     }
 
