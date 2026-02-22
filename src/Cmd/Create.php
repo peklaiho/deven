@@ -36,9 +36,7 @@ class Create implements ICommand
 
         // Configure NAT port forwarding
         $networkConfig = new NetworkConfig($hypervisor);
-        $networkConfig->configure($name, [
-            $config->getSshPort() => 22
-        ]);
+        $networkConfig->configure($name, $config->getPorts());
 
         // Copy the image for hard disk, resize and attach
         $hardDiskFile = DEVEN_VBOX_DIR . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR . "$name.vdi";
@@ -87,5 +85,6 @@ class Create implements ICommand
 
         // We are done!
         Utils::outln('VM created successfully!');
+        Utils::outln("You can now run 'deven init' to initialize the VM.");
     }
 }

@@ -20,6 +20,8 @@ class Stop implements ICommand
             Utils::error('VM is already stopped!');
         }
 
+        Utils::outln('Shutting down VM...');
+
         $sshRunner = new SshRunner($config->getSshPort());
         $sshRunner->run($config->getName(), ['sudo', 'shutdown', 'now']);
         $hypervisor->waitForStatus($config->getName(), 'poweroff');
