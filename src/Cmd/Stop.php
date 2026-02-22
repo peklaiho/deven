@@ -3,6 +3,7 @@ namespace PekLaiho\Deven\Cmd;
 
 use PekLaiho\Deven\Config;
 use PekLaiho\Deven\IHypervisor;
+use PekLaiho\Deven\SshRunner;
 use PekLaiho\Deven\Utils;
 
 class Stop implements ICommand
@@ -19,7 +20,8 @@ class Stop implements ICommand
             Utils::error('VM is already stopped!');
         }
 
-        $hypervisor->stop($config->getName());
+        $sshRunner = new SshRunner($config->getSshPort());
+        $sshRunner->run($config->getName(), ['sudo', 'shutdown', 'now']);
         $hypervisor->waitForStatus($config->getName(), 'poweroff');
     }
 }
