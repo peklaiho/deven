@@ -4,6 +4,7 @@ namespace PekLaiho\Deven\Cmd;
 use PekLaiho\Deven\CloudInitSeedGenerator;
 use PekLaiho\Deven\CloudInitStatus;
 use PekLaiho\Deven\Config;
+use PekLaiho\Deven\GuestAdditions;
 use PekLaiho\Deven\IHypervisor;
 use PekLaiho\Deven\NetworkConfig;
 use PekLaiho\Deven\SharedFolders;
@@ -64,14 +65,8 @@ class Create implements ICommand
         $cloudInitStatus = new CloudInitStatus($sshRunner);
         $cloudInitStatus->waitForCompletion($name);
 
-        // Install terminfo if needed
-        $termInfo = new TermInfoInstaller($sshRunner);
-        $termInfo->install($name);
-
-        // Configure the shared folder
-        $sharedFolders->configure($name);
-
-        // Shutdown the machine
+        // Lets reboot here before installing VBGA, because
+        // it is possible that cloud-init installed a new kernel.
         $sshRunner->run($name, ['sudo', 'shutdown', 'now']);
         $hypervisor->waitForStatus($name, 'poweroff');
 
@@ -79,12 +74,29 @@ class Create implements ICommand
         $hypervisor->detachDvdDrive($name);
         Utils::deleteFile($seedFile);
 
-        // Start the machine again
+        // Start her up again
         $hypervisor->start($name);
         $hypervisor->waitForStatus($name, 'running');
 
+        // Wait for SSH connection
+        $sshRunner->waitForSshConnection($name);
+
+        // Install VirtualBox Guest Additions
+        $guestAdditions = new GuestAdditions($sshRunner);
+        $guestAdditions->install($name);
+
+        // Install terminfo if needed
+        $termInfo = new TermInfoInstaller($sshRunner);
+        $termInfo->install($name);
+
+        // Configure the shared folder
+        $sharedFolders->configure($name);
+
+        // Final reboot to enable all config changes
+        $sshRunner->run($name, ['sudo', 'reboot']);
+
         // We are done!
-        Utils::outln('VM created successfully!');
+        Utils::outln('VM created successfully! Rebooting...');
         Utils::outln("You can now run 'deven init' to initialize the VM.");
     }
 }

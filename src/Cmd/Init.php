@@ -37,7 +37,7 @@ class Init implements ICommand
             }
         }
 
-        $outputFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . $config->getName() . '-init-output.txt';
+        $outputFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'init-output.txt';
         Utils::outln("Running init script, saving output to $outputFile...");
 
         // Run the init file

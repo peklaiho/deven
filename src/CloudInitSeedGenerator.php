@@ -3,10 +3,6 @@ namespace PekLaiho\Deven;
 
 class CloudInitSeedGenerator
 {
-    // Location of VBoxGuestAdditions.iso
-    // On Arch Linux this is installed by package virtualbox-guest-iso
-    const GUEST_ADDITIONS_ISO = '/usr/lib/virtualbox/additions/VBoxGuestAdditions.iso';
-
     public function make(string $name): string
     {
         $targetFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . "seed-$name.iso";
@@ -14,8 +10,6 @@ class CloudInitSeedGenerator
         // Check if target file already exists
         if (file_exists($targetFile)) {
             Utils::error("File $targetFile already exists");
-        } elseif (!is_readable(self::GUEST_ADDITIONS_ISO)) {
-            Utils::error('Guest additions ISO is not readable: ' . self::GUEST_ADDITIONS_ISO);
         }
 
         // Get or create SSH keys
@@ -40,7 +34,6 @@ class CloudInitSeedGenerator
             '-rock',
             $metaDataFile,
             $userDataFile,
-            self::GUEST_ADDITIONS_ISO,
         ]);
 
         if ($result->getStatus() !== 0) {

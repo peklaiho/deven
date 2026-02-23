@@ -47,20 +47,6 @@ class CloudInitConfigGenerator
                 // Packages needed for VirtualBox Guest Additions
                 'build-essential',
                 'dkms',
-                'linux-headers-amd64',
-            ],
-            'runcmd' => [
-                // Install VirtualBox Guest Additions
-                //
-                // We ignore non-zero exit from VBGA installer because
-                // it fails with this non-important error:
-                //
-                // Could not set up the VBoxClient desktop service.
-                [ 'mkdir', '-p', '/mnt/seed', '/mnt/vbga' ],
-                [ 'mount', '/dev/cdrom', '/mnt/seed' ],
-                [ 'mount', '-o', 'loop', '/mnt/seed/VBoxGuestAdditions.iso', '/mnt/vbga' ],
-                [ 'test', '-x', '/mnt/vbga/VBoxLinuxAdditions.run' ],
-                [ 'sh', '-c', "/mnt/vbga/VBoxLinuxAdditions.run --nox11 || echo 'Ignore non-zero exit from VBGA'" ],
             ],
         ];
 

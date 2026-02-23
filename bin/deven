@@ -17,6 +17,7 @@ if ($argc < 2) {
     PekLaiho\Deven\Utils::outln('start');
     PekLaiho\Deven\Utils::outln('status');
     PekLaiho\Deven\Utils::outln('stop');
+    PekLaiho\Deven\Utils::outln('vbga');
     exit(0);
 }
 
@@ -58,6 +59,7 @@ $commandMap = [
     'start' => new PekLaiho\Deven\Cmd\Start(),
     'status' => new PekLaiho\Deven\Cmd\Status(),
     'stop' => new PekLaiho\Deven\Cmd\Stop(),
+    'vbga' => new PekLaiho\Deven\Cmd\VBGA(),
 ];
 
 $command = null;
