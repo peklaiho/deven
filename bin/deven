@@ -5,19 +5,26 @@ require(__DIR__ . '/../vendor/autoload.php');
 // Debug mode: more verbose output
 define('DEVEN_DEBUG', in_array('--debug', $argv));
 
+// Available commands
+$commandMap = [
+    'attach' => new PekLaiho\Deven\Cmd\Attach(),
+    'create' => new PekLaiho\Deven\Cmd\Create(),
+    'destroy' => new PekLaiho\Deven\Cmd\Destroy(),
+    'detach' => new PekLaiho\Deven\Cmd\Detach(),
+    'image' => new PekLaiho\Deven\Cmd\Image(),
+    'init' => new PekLaiho\Deven\Cmd\Init(),
+    'start' => new PekLaiho\Deven\Cmd\Start(),
+    'status' => new PekLaiho\Deven\Cmd\Status(),
+    'stop' => new PekLaiho\Deven\Cmd\Stop(),
+    'vbga' => new PekLaiho\Deven\Cmd\VBGA(),
+];
+
 // If no arguments, show help and exit
 if ($argc < 2) {
     PekLaiho\Deven\Utils::outln('Available commands:');
-    PekLaiho\Deven\Utils::outln('attach');
-    PekLaiho\Deven\Utils::outln('create');
-    PekLaiho\Deven\Utils::outln('destroy');
-    PekLaiho\Deven\Utils::outln('detach');
-    PekLaiho\Deven\Utils::outln('image');
-    PekLaiho\Deven\Utils::outln('init');
-    PekLaiho\Deven\Utils::outln('start');
-    PekLaiho\Deven\Utils::outln('status');
-    PekLaiho\Deven\Utils::outln('stop');
-    PekLaiho\Deven\Utils::outln('vbga');
+    foreach (array_keys($commandMap) as $cmdName) {
+        PekLaiho\Deven\Utils::outln($cmdName);
+    }
     exit(0);
 }
 
@@ -49,19 +56,7 @@ $config = $configReader->read($configFile);
 
 $hypervisor = new PekLaiho\Deven\VirtualBox();
 
-$commandMap = [
-    'attach' => new PekLaiho\Deven\Cmd\Attach(),
-    'create' => new PekLaiho\Deven\Cmd\Create(),
-    'destroy' => new PekLaiho\Deven\Cmd\Destroy(),
-    'detach' => new PekLaiho\Deven\Cmd\Detach(),
-    'image' => new PekLaiho\Deven\Cmd\Image(),
-    'init' => new PekLaiho\Deven\Cmd\Init(),
-    'start' => new PekLaiho\Deven\Cmd\Start(),
-    'status' => new PekLaiho\Deven\Cmd\Status(),
-    'stop' => new PekLaiho\Deven\Cmd\Stop(),
-    'vbga' => new PekLaiho\Deven\Cmd\VBGA(),
-];
-
+// Find the right command
 $command = null;
 foreach ($commandMap as $name => $cmd) {
     if (str_starts_with($name, $argv[1])) {
