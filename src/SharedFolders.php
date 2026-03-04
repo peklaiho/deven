@@ -22,36 +22,19 @@ class SharedFolders
         Utils::outln("Configuring shared directory");
 
         // Add user to vboxsf group
-        $result = $this->sshRunner->run($vmName, ['sudo', 'usermod', '-aG', 'vboxsf', 'deven']);
-        if ($result->getStatus() !== 0) {
-            Utils::error('Unable to add user to vboxsf group: ' . $result->getStdErr());
-        }
+        $this->sshRunner->run($vmName, ['sudo', 'usermod', '-aG', 'vboxsf', 'deven']);
 
         // Create the mount dir
-        $result = $this->sshRunner->run($vmName, ['sudo', 'mkdir', '-p', '/deven']);
-        if ($result->getStatus() !== 0) {
-            Utils::error('Unable to create shared directory: ' . $result->getStdErr());
-        }
+        $this->sshRunner->run($vmName, ['sudo', 'mkdir', '-p', '/deven']);
 
         // Install the systemd mount file
         $mountFile = $this->createMountFile();
         $this->sshRunner->copyFile($vmName, $mountFile, '~/deven.mount');
         Utils::deleteFile($mountFile);
 
-        $result = $this->sshRunner->run($vmName, ['sudo', 'mv', '~/deven.mount', '/etc/systemd/system/deven.mount']);
-        if ($result->getStatus() !== 0) {
-            Utils::error('Unable to copy systemd mount file: ' . $result->getStdErr());
-        }
-
-        $result = $this->sshRunner->run($vmName, ['sudo', 'chown', 'root:root', '/etc/systemd/system/deven.mount']);
-        if ($result->getStatus() !== 0) {
-            Utils::error('Unable to set ownership for systemd mount file: ' . $result->getStdErr());
-        }
-
-        $result = $this->sshRunner->run($vmName, ['sudo', 'systemctl', 'enable', 'deven.mount']);
-        if ($result->getStatus() !== 0) {
-            Utils::error('Unable to enable systemd mount: ' . $result->getStdErr());
-        }
+        $this->sshRunner->run($vmName, ['sudo', 'mv', '~/deven.mount', '/etc/systemd/system/deven.mount']);
+        $this->sshRunner->run($vmName, ['sudo', 'chown', 'root:root', '/etc/systemd/system/deven.mount']);
+        $this->sshRunner->run($vmName, ['sudo', 'systemctl', 'enable', 'deven.mount']);
     }
 
     private function createMountFile(): string

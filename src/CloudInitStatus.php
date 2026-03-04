@@ -13,12 +13,8 @@ class CloudInitStatus
     {
         $result = $this->sshRunner->run($vmName, ['cloud-init', 'status']);
 
-        if ($result->getStatus() === 0) {
-            $parts = explode(':', $result->getStdOut());
-            return trim($parts[1]);
-        }
-
-        Utils::error('Unable to read cloud-init status: ' . $result->getStdErr());
+        $parts = explode(':', $result->getStdOut());
+        return trim($parts[1]);
     }
 
     public function waitForCompletion(string $vmName, int $delay = 10): void

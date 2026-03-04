@@ -21,7 +21,7 @@ class TermInfoInstaller
         // Check if it already known on guest
         $result = $this->sshRunner->run($vmName, [
             'infocmp', $term,
-        ]);
+        ], true);
 
         if ($result->getStatus() === 0) {
             Utils::outln("Terminal type $term is already supported on VM");
@@ -45,24 +45,16 @@ class TermInfoInstaller
         $this->sshRunner->copyFile($vmName, $tempFile, "~/$term.ti");
 
         // Apply it to the guest
-        $result = $this->sshRunner->run($vmName, [
+        $this->sshRunner->run($vmName, [
             'sudo', 'tic', "~/$term.ti",
         ]);
-
-        if ($result->getStatus() !== 0) {
-            Utils::error('Unable to install terminfo on VM: ' . $result->getStdErr());
-        }
 
         // Finally delete both files
         Utils::deleteFile($tempFile);
 
-        $result = $this->sshRunner->run($vmName, [
+        $this->sshRunner->run($vmName, [
             'rm', "~/$term.ti"
         ]);
-
-        if ($result->getStatus() !== 0) {
-            Utils::error('Unable to clean up terminfo file on VM: ' . $result->getStdErr());
-        }
 
         Utils::outln("Terminfo for $term installed successfully on VM");
     }

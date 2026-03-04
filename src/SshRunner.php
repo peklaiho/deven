@@ -30,15 +30,21 @@ class SshRunner
         }
     }
 
-    public function run(string $vmName, array $command): ShellResult
+    public function run(string $vmName, array $command, bool $ignoreError = false): ShellResult
     {
         $shell = new ShellRunner();
-        return $shell->run(array_merge([
+        $result = $shell->run(array_merge([
             'ssh',
             '-i', '~/.deven/ssh-user-key',
             '-p', $this->port,
             'deven@127.0.0.1'
         ], $command));
+
+        if (!$ignoreError && $result->getStatus() !== 0) {
+            Utils::error('Unable to execute SSH command: ' . implode(' ', $command) . ': ' . $result->getStdErr());
+        }
+
+        return $result;
     }
 
     public function waitForSshConnection(string $vmName, int $delay = 5): void

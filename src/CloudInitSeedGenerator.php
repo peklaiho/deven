@@ -22,8 +22,8 @@ class CloudInitSeedGenerator
         $metaDataFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'meta-data';
         $userDataFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'user-data';
 
-        Utils::writeFile($metaDataFile, $configGen->makeMetaData("deven-$name", $name));
-        Utils::writeFile($userDataFile, $configGen->makeUserData($name, $hostKey, $userKey));
+        Utils::writeFile($metaDataFile, $configGen->makeMetaData("deven-$name", $name), true);
+        Utils::writeFile($userDataFile, $configGen->makeUserData($name, $hostKey, $userKey), true);
 
         // Create the ISO
         $result = (new ShellRunner())->run([

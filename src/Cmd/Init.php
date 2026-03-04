@@ -31,7 +31,7 @@ class Init implements ICommand
 
         // Check if init has been already completed
         if (!in_array('--confirm', $args)) {
-            $result = $sshRunner->run($config->getName(), ['sudo', 'test', '-f', $initCompleteFile]);
+            $result = $sshRunner->run($config->getName(), ['sudo', 'test', '-f', $initCompleteFile], true);
             if ($result->getStatus() === 0) {
                 Utils::error('Init has been already completed. Add --confirm option to run anyway.');
             }
@@ -41,7 +41,7 @@ class Init implements ICommand
         Utils::outln("Running init script, saving output to $outputFile...");
 
         // Run the init file
-        $result = $sshRunner->run($config->getName(), ['sudo', 'sh', '/deven/' . self::INIT_FILE]);
+        $result = $sshRunner->run($config->getName(), ['sudo', 'sh', '/deven/' . self::INIT_FILE], true);
 
         // Save output to file
         Utils::writeFile($outputFile, $result->getStdOut(), true);
@@ -52,10 +52,7 @@ class Init implements ICommand
         }
 
         // Create the init-completed file
-        $result = $sshRunner->run($config->getName(), ['sudo', 'touch', $initCompleteFile]);
-        if ($result->getStatus() !== 0) {
-            Utils::error("Unable to create file $initCompleteFile: " . $result->getStdErr());
-        }
+        $sshRunner->run($config->getName(), ['sudo', 'touch', $initCompleteFile]);
 
         Utils::outln('Init script completed successfully!');
     }
