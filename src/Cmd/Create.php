@@ -41,7 +41,7 @@ class Create implements ICommand
 
         // Copy the image for hard disk, resize and attach
         $hardDiskFile = DEVEN_VBOX_DIR . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR . "$name.vdi";
-        Utils::copyFile($image, $hardDiskFile);
+        $hypervisor->cloneDisk($image, $hardDiskFile);
         $hypervisor->resizeDisk($hardDiskFile, $config->getDisk() * 1024);
         $hypervisor->attachHardDisk($name, $hardDiskFile);
 

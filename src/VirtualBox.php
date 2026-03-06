@@ -38,6 +38,24 @@ class VirtualBox implements IHypervisor
         $this->performStorageAttach($vmName, self::STORAGE_DVD_DRIVE_PORT, 'dvddrive', $file);
     }
 
+    public function cloneDisk(string $source, string $target): void
+    {
+        Utils::outln("Clone hard disk $source to $target");
+
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'clonemedium',
+            $source,
+            $target,
+            '--format',
+            'VDI',
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStdErr());
+        }
+    }
+
     public function convertRawImage(string $input, string $output): void
     {
         Utils::outln("Converting image $input to $output");

@@ -6,6 +6,7 @@ interface IHypervisor
     public function addSharedFolder(string $vmName, string $shareName, string $hostDir);
     public function attachHardDisk(string $vmName, string $file): void;
     public function attachDvdDrive(string $vmName, string $file): void;
+    public function cloneDisk(string $source, string $target): void;
     public function convertRawImage(string $input, string $output): void;
     public function create(string $vmName): void;
     public function destroy(string $vmName): void;
