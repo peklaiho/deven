@@ -8,6 +8,7 @@ define('DEVEN_DEBUG', in_array('--debug', $argv));
 // Available commands
 $commandMap = [
     'attach' => new PekLaiho\Deven\Cmd\Attach(),
+    'config' => new PekLaiho\Deven\Cmd\Configure(),
     'create' => new PekLaiho\Deven\Cmd\Create(),
     'destroy' => new PekLaiho\Deven\Cmd\Destroy(),
     'detach' => new PekLaiho\Deven\Cmd\Detach(),
@@ -17,7 +18,6 @@ $commandMap = [
     'start' => new PekLaiho\Deven\Cmd\Start(),
     'status' => new PekLaiho\Deven\Cmd\Status(),
     'stop' => new PekLaiho\Deven\Cmd\Stop(),
-    'vbga' => new PekLaiho\Deven\Cmd\VBGA(),
 ];
 
 // If no arguments, show help and exit

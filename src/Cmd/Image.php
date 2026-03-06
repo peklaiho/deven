@@ -3,36 +3,24 @@ namespace PekLaiho\Deven\Cmd;
 
 use PekLaiho\Deven\Config;
 use PekLaiho\Deven\IHypervisor;
+use PekLaiho\Deven\SubCommandHandler;
 use PekLaiho\Deven\Utils;
 
 class Image implements ICommand
 {
+    use SubCommandHandler;
+
     public function execute(IHypervisor $hypervisor, Config $config, array $args): void
     {
-        $subcommands = [
+        $subCommands = [
             'download' => 'cmdDownload',
             'list' => 'cmdList',
         ];
 
-        if (empty($args)) {
-            Utils::outln('Available subcommands:');
-            foreach (array_keys($subcommands) as $name) {
-                Utils::outln($name);
-            }
-            return;
-        }
-
-        foreach ($subcommands as $name => $sub) {
-            if (str_starts_with($name, $args[0])) {
-                [$this, $sub]($hypervisor, $config, array_slice($args, 1));
-                return;
-            }
-        }
-
-        Utils::error('Unknown subcommand: ' . $args[0]);
+        $this->handleSubCommand($subCommands, $hypervisor, $config, $args);
     }
 
-    public function cmdDownload(IHypervisor $hypervisor, Config $config, array $args): void
+    protected function cmdDownload(IHypervisor $hypervisor, Config $config, array $args): void
     {
         // Base name of the image file
         $base = $config->getImage();
@@ -73,7 +61,7 @@ class Image implements ICommand
         Utils::outln("Image $base was downloaded successfully!");
     }
 
-    public function cmdList(IHypervisor $hypervisor, Config $config, array $args): void
+    protected function cmdList(IHypervisor $hypervisor, Config $config, array $args): void
     {
         $images = glob(DEVEN_IMAGE_DIR . DIRECTORY_SEPARATOR . '*.vdi');
 
