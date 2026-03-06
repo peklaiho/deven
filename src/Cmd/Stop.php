@@ -22,8 +22,16 @@ class Stop implements ICommand
 
         Utils::outln('Shutting down VM...');
 
-        $sshRunner = new SshRunner($config->getSshPort());
-        $sshRunner->run($config->getName(), ['sudo', 'shutdown', 'now']);
+        if (in_array('--hard', $args)) {
+            $hypervisor->stop($config->getName(), 'poweroff');
+        } elseif (in_array('--soft', $args)) {
+            $hypervisor->stop($config->getName(), 'acpipowerbutton');
+        } else {
+            // Default to shutdown via SSH
+            $sshRunner = new SshRunner($config->getSshPort());
+            $sshRunner->run($config->getName(), ['sudo', 'shutdown', 'now']);
+        }
+
         $hypervisor->waitForStatus($config->getName(), 'poweroff');
     }
 }

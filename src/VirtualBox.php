@@ -272,15 +272,15 @@ class VirtualBox implements IHypervisor
         return $result;
     }
 
-    public function stop(string $vmName): void
+    public function stop(string $vmName, string $command): void
     {
-        Utils::outln('Shutting down VM...');
+        Utils::outln("Shutting down VM ($command)...");
 
         $result = (new ShellRunner())->run([
             'VBoxManage',
             'controlvm',
             $vmName,
-            'acpipowerbutton',
+            $command,
         ]);
 
         if ($result->getStatus() !== 0) {
