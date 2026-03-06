@@ -13,6 +13,7 @@ $commandMap = [
     'detach' => new PekLaiho\Deven\Cmd\Detach(),
     'image' => new PekLaiho\Deven\Cmd\Image(),
     'init' => new PekLaiho\Deven\Cmd\Init(),
+    'reboot' => new PekLaiho\Deven\Cmd\Reboot(),
     'start' => new PekLaiho\Deven\Cmd\Start(),
     'status' => new PekLaiho\Deven\Cmd\Status(),
     'stop' => new PekLaiho\Deven\Cmd\Stop(),
