@@ -39,6 +39,10 @@ class Create implements ICommand
         $networkConfig = new NetworkConfig($hypervisor);
         $networkConfig->configure($name, $config->getPorts());
 
+        // Configure graphics controller
+        $hypervisor->setGraphicsController($name, 'vmsvga');
+        $hypervisor->setGraphicsMemory($name, 128);
+
         // Copy the image for hard disk, resize and attach
         $hardDiskFile = DEVEN_VBOX_DIR . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR . "$name.vdi";
         $hypervisor->cloneDisk($image, $hardDiskFile);

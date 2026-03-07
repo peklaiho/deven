@@ -200,6 +200,45 @@ class VirtualBox implements IHypervisor
         }
     }
 
+    public function setGraphicsController(string $vmName, string $controller): void
+    {
+        $validValues = ['none', 'vboxvga', 'vmsvga', 'vboxsvga'];
+        if (!in_array($controller, $validValues)) {
+            Utils::error("Unknown graphics controller $controller");
+        }
+
+        Utils::outln("Setting graphics controller to $controller");
+
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'modifyvm',
+            $vmName,
+            '--graphicscontroller',
+            $controller,
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStdErr());
+        }
+    }
+
+    public function setGraphicsMemory(string $vmName, int $value): void
+    {
+        Utils::outln("Setting graphics memory to $value MB");
+
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'modifyvm',
+            $vmName,
+            '--vram',
+            $value,
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStdErr());
+        }
+    }
+
     public function setupStorageController(string $vmName): void
     {
         Utils::outln('Setting up storage controller: ' . self::STORAGE_CONTROLLER_NAME);
