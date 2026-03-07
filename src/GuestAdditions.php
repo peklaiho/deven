@@ -45,11 +45,13 @@ class GuestAdditions
 
         // Write output to a file
         $outputFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'vbga-install-output.txt';
-        Utils::outln("Running VBGA installer, saving output to $outputFile...");
+        $errorFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'vbga-install-errors.txt';
+        Utils::outln("Running VBGA installer, saving output to $outputFile and $errorFile...");
 
         // Run the installer
         $result = $this->sshRunner->run($vmName, ['sudo', $installer, '--nox11'], true);
         Utils::writeFile($outputFile, $result->getStdOut(), true);
+        Utils::writeFile($errorFile, $result->getStdErr(), true);
 
         // Do not kill the script on errors after this point.
         // The installer often fails due to this non-critical error:
