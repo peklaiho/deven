@@ -34,6 +34,18 @@ class SharedFolders
 
         $this->sshRunner->run($vmName, ['sudo', 'mv', '~/deven.mount', '/etc/systemd/system/deven.mount']);
         $this->sshRunner->run($vmName, ['sudo', 'chown', 'root:root', '/etc/systemd/system/deven.mount']);
+
+        // Install the systemd service file to load vboxsf module
+        $vboxsfServiceFile = $this->createVboxsfServiceFile();
+        $this->sshRunner->copyFile($vmName, $vboxsfServiceFile, '~/deven-vboxsf.service');
+        Utils::deleteFile($vboxsfServiceFile);
+
+        $this->sshRunner->run($vmName, ['sudo', 'mv', '~/deven-vboxsf.service', '/etc/systemd/system/deven-vboxsf.service']);
+        $this->sshRunner->run($vmName, ['sudo', 'chown', 'root:root', '/etc/systemd/system/deven-vboxsf.service']);
+
+        // Enable the new units
+        $this->sshRunner->run($vmName, ['sudo', 'systemctl', 'daemon-reload']);
+        $this->sshRunner->run($vmName, ['sudo', 'systemctl', 'enable', 'deven-vboxsf.service']);
         $this->sshRunner->run($vmName, ['sudo', 'systemctl', 'enable', 'deven.mount']);
     }
 
@@ -42,8 +54,8 @@ class SharedFolders
         $data = <<<'EOF'
 [Unit]
 Description=Shared folder /deven
-Requires=vboxadd-service.service
-After=vboxadd-service.service
+Requires=deven-vboxsf.service
+After=deven-vboxsf.service
 
 [Mount]
 What=deven
@@ -57,6 +69,31 @@ WantedBy=multi-user.target
 EOF;
 
         $file = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'deven.mount';
+
+        Utils::writeFile($file, $data, true);
+
+        return $file;
+    }
+
+    private function createVboxsfServiceFile(): string
+    {
+        $data = <<<'EOF'
+[Unit]
+Description=Load VirtualBox shared folders kernel module
+Requires=vboxadd-service.service
+After=vboxadd-service.service
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/modprobe vboxsf
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+
+EOF;
+
+        $file = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'deven-vboxsf.service';
 
         Utils::writeFile($file, $data, true);
 
