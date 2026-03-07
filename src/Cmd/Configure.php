@@ -19,13 +19,27 @@ class Configure implements ICommand
         }
 
         $subCommands = [
-            'vbga' => 'cmdVbga',
+            'mount-status' => 'cmdMountStatus',
+            'vbga-install' => 'cmdVbgaInstall',
+            'vbga-status' => 'cmdVbgaStatus',
         ];
 
         $this->handleSubCommand($subCommands, $hypervisor, $config, $args);
     }
 
-    protected function cmdVbga(IHypervisor $hypervisor, Config $config, array $args): void
+    protected function cmdMountStatus(IHypervisor $hypervisor, Config $config, array $args): void
+    {
+        $status = $hypervisor->status($config->getName());
+        if ($status['VMState'] !== 'running') {
+            Utils::error('The VM must be running first!');
+        }
+
+        $sshRunner = new SshRunner($config->getSshPort());
+        $result = $sshRunner->run($config->getName(), ['sudo', 'systemctl', 'status', 'deven.mount'], true);
+        Utils::outln($result->getStdOut());
+    }
+
+    protected function cmdVbgaInstall(IHypervisor $hypervisor, Config $config, array $args): void
     {
         $status = $hypervisor->status($config->getName());
         if ($status['VMState'] !== 'running') {
@@ -35,5 +49,17 @@ class Configure implements ICommand
         $sshRunner = new SshRunner($config->getSshPort());
         $guestAdditions = new GuestAdditions($sshRunner);
         $guestAdditions->install($config->getName());
+    }
+
+    protected function cmdVbgaStatus(IHypervisor $hypervisor, Config $config, array $args): void
+    {
+        $status = $hypervisor->status($config->getName());
+        if ($status['VMState'] !== 'running') {
+            Utils::error('The VM must be running first!');
+        }
+
+        $sshRunner = new SshRunner($config->getSshPort());
+        $result = $sshRunner->run($config->getName(), ['sudo', 'systemctl', 'status', 'vboxadd-service'], true);
+        Utils::outln($result->getStdOut());
     }
 }
