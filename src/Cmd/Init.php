@@ -12,11 +12,13 @@ class Init implements ICommand
 
     public function execute(IHypervisor $hypervisor, Config $config, array $args): void
     {
-        if (!$hypervisor->exists($config->getName())) {
+        $vmName = $config->getName();
+
+        if (!$hypervisor->exists($vmName)) {
             Utils::error('VM does not exist!');
         }
 
-        $status = $hypervisor->status($config->getName());
+        $status = $hypervisor->status($vmName);
         if ($status['VMState'] !== 'running') {
             Utils::error('The VM must be running first!');
         }
@@ -31,20 +33,22 @@ class Init implements ICommand
 
         // Check if init has been already completed
         if (!in_array('--confirm', $args)) {
-            $result = $sshRunner->run($config->getName(), ['sudo', 'test', '-f', $initCompleteFile], true);
+            $result = $sshRunner->run($vmName, ['sudo', 'test', '-f', $initCompleteFile], true);
             if ($result->getStatus() === 0) {
                 Utils::error('Init has been already completed. Add --confirm option to run anyway.');
             }
         }
 
-        $outputFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'init-output.txt';
-        Utils::outln("Running init script, saving output to $outputFile...");
+        $outputFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . "$vmName-init-output.txt";
+        $errorFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . "$vmName-init-errors.txt";
+        Utils::outln("Running init script...");
 
         // Run the init file
-        $result = $sshRunner->run($config->getName(), ['sudo', 'sh', '/deven/' . self::INIT_FILE], true);
+        $result = $sshRunner->run($vmName, ['sudo', 'sh', '/deven/' . self::INIT_FILE], true, true);
 
         // Save output to file
         Utils::writeFile($outputFile, $result->getStdOut(), true);
+        Utils::writeFile($errorFile, $result->getStdErr(), true);
 
         // Check status
         if ($result->getStatus() !== 0) {
@@ -52,7 +56,7 @@ class Init implements ICommand
         }
 
         // Create the init-completed file
-        $sshRunner->run($config->getName(), ['sudo', 'touch', $initCompleteFile]);
+        $sshRunner->run($vmName, ['sudo', 'touch', $initCompleteFile]);
 
         Utils::outln('Init script completed successfully!');
     }

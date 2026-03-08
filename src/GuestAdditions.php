@@ -44,12 +44,12 @@ class GuestAdditions
         $this->sshRunner->run($vmName, ['sudo', 'test', '-x', $installer]);
 
         // Write output to a file
-        $outputFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'vbga-install-output.txt';
-        $errorFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . 'vbga-install-errors.txt';
-        Utils::outln("Running VBGA installer, saving output to $outputFile and $errorFile...");
+        $outputFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . "$vmName-vbga-install-output.txt";
+        $errorFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . "$vmName-vbga-install-errors.txt";
+        Utils::outln("Running VBGA installer...");
 
         // Run the installer
-        $result = $this->sshRunner->run($vmName, ['sudo', $installer, '--nox11'], true);
+        $result = $this->sshRunner->run($vmName, ['sudo', $installer, '--nox11'], true, true);
         Utils::writeFile($outputFile, $result->getStdOut(), true);
         Utils::writeFile($errorFile, $result->getStdErr(), true);
 

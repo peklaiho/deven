@@ -30,7 +30,7 @@ class SshRunner
         }
     }
 
-    public function run(string $vmName, array $command, bool $ignoreError = false): ShellResult
+    public function run(string $vmName, array $command, bool $ignoreError = false, bool $streaming = false): ShellResult
     {
         $shell = new ShellRunner();
         $result = $shell->run(array_merge([
@@ -38,7 +38,7 @@ class SshRunner
             '-i', '~/.deven/ssh-user-key',
             '-p', $this->port,
             'deven@127.0.0.1'
-        ], $command));
+        ], $command), $streaming);
 
         if (!$ignoreError && $result->getStatus() !== 0) {
             Utils::error('Unable to execute SSH command: ' . implode(' ', $command) . ': ' . $result->getStdErr());
