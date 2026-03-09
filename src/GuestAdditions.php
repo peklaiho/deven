@@ -30,8 +30,8 @@ class GuestAdditions
         $result = $this->sshRunner->run($vmName, ['uname', '-r']);
         $kernel = trim($result->getStdOut());
 
-        // Install the headers
-        $this->sshRunner->run($vmName, ['sudo', 'apt-get', 'install', '-y', "linux-headers-$kernel"]);
+        // Install the headers (stream output)
+        $this->sshRunner->run($vmName, ['sudo', 'apt-get', 'install', '-y', "linux-headers-$kernel"], false, true);
 
         // Make mount directory
         $this->sshRunner->run($vmName, ['sudo', 'mkdir', '-p', '/mnt/vbga']);

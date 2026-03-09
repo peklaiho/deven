@@ -31,7 +31,7 @@ class CloudInitConfigGenerator
                 [
                     'name' => 'deven',
                     'sudo' => 'ALL=(ALL) NOPASSWD:ALL',
-                    'groups' => 'sudo',
+                    'groups' => [ 'adm', 'sudo' ],
                     'shell' => '/bin/bash',
                     'plain_text_passwd' => 'deven',
                     'lock_passwd' => false,
