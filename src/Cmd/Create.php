@@ -55,8 +55,10 @@ class Create implements ICommand
         $hypervisor->attachDvdDrive($name, $seedFile);
 
         // Create the shared folder in VM
-        $sharedFolders = new SharedFolders($hypervisor, $sshRunner);
-        $sharedFolders->create($name, $config->getDir());
+        if ($config->useVirtualBoxSharedFolders()) {
+            $sharedFolders = new SharedFolders($hypervisor, $sshRunner);
+            $sharedFolders->create($name, $config->getDir());
+        }
 
         // Start her up
         $hypervisor->start($name);
@@ -86,15 +88,19 @@ class Create implements ICommand
         $sshRunner->waitForSshConnection($name);
 
         // Install VirtualBox Guest Additions
-        $guestAdditions = new GuestAdditions($sshRunner);
-        $guestAdditions->install($name);
+        if ($config->installGuestAdditions()) {
+            $guestAdditions = new GuestAdditions($sshRunner);
+            $guestAdditions->install($name);
+        }
 
         // Install terminfo if needed
         $termInfo = new TermInfoInstaller($sshRunner);
         $termInfo->install($name);
 
         // Configure the shared folder
-        $sharedFolders->configure($name);
+        if ($config->useVirtualBoxSharedFolders()) {
+            $sharedFolders->configure($name);
+        }
 
         // Final reboot to enable all config changes
         $sshRunner->run($name, ['sudo', 'reboot']);

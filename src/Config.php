@@ -56,6 +56,23 @@ class Config
         return $this->ports;
     }
 
+    // Optional install steps
+
+    public function installGuestAdditions(): bool
+    {
+        return true;
+    }
+
+    public function useNetworkFileSystem(): bool
+    {
+        return true;
+    }
+
+    public function useVirtualBoxSharedFolders(): bool
+    {
+        return false;
+    }
+
     // Setters
 
     public function setImage(string $value): void

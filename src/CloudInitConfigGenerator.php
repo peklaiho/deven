@@ -43,11 +43,6 @@ class CloudInitConfigGenerator
             ],
             'package_update' => true,
             'package_upgrade' => true,
-            'packages' => [
-                // Packages needed for VirtualBox Guest Additions
-                'build-essential',
-                'dkms',
-            ],
         ];
 
         $header = "#cloud-config\n";
