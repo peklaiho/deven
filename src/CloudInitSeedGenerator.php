@@ -7,11 +7,6 @@ class CloudInitSeedGenerator
     {
         $targetFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . "seed-$name.iso";
 
-        // Check if target file already exists
-        if (file_exists($targetFile)) {
-            Utils::error("File $targetFile already exists");
-        }
-
         // Get or create SSH keys
         $hostKey = (new SshKeyManager())->getHostKey();
         $userKey = (new SshKeyManager())->getUserKey();

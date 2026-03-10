@@ -13,7 +13,7 @@ class SshKeyManager
         return $this->getKey('ssh-user-key');
     }
 
-    private function getKey(string $name): SshKey
+    protected function getKey(string $name): SshKey
     {
         $keyFile = DEVEN_DIR . DIRECTORY_SEPARATOR . $name;
 

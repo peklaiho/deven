@@ -9,6 +9,7 @@ interface IHypervisor
     public function cloneDisk(string $source, string $target): void;
     public function convertRawImage(string $input, string $output): void;
     public function create(string $vmName): void;
+    public function createHostOnlyNetworkInterface(): void;
     public function destroy(string $vmName): void;
     public function detachHardDisk(string $vmName): void;
     public function detachDvdDrive(string $vmName): void;
@@ -19,6 +20,8 @@ interface IHypervisor
     public function setCpusAndMemory(string $vmName, int $cpus, int $ram): void;
     public function setGraphicsController(string $vmName, string $controller): void;
     public function setGraphicsMemory(string $vmName, int $value): void;
+    public function setupDhcpServer(): void;
+    public function setupNetworkInterfaces(string $vmName): void;
     public function setupStorageController(string $vmName): void;
     public function start(string $vmName, bool $showGui = false): void;
     public function status(string $vmName): array;

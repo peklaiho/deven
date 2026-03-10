@@ -60,7 +60,7 @@ class Config
 
     public function installGuestAdditions(): bool
     {
-        return true;
+        return false;
     }
 
     public function useNetworkFileSystem(): bool

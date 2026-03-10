@@ -91,6 +91,51 @@ class VirtualBox implements IHypervisor
         }
     }
 
+    public function createHostOnlyNetworkInterface(): void
+    {
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'list',
+            'hostonlyifs',
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStdErr());
+        }
+
+        if (!empty(trim($result->getStdOut()))) {
+            // Already exists
+            Utils::outln('Host-only network interface already exists');
+            return;
+        }
+
+        Utils::outln('Creating host-only network interface');
+
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'hostonlyif',
+            'create',
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStdErr());
+        }
+
+        // Set IP address and subnet mask
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'hostonlyif',
+            'ipconfig',
+            'vboxnet0',
+            '--ip', '192.168.56.1',
+            '--netmask', '255.255.255.0',
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStdErr());
+        }
+    }
+
     public function destroy(string $vmName): void
     {
         $result = (new ShellRunner())->run([
@@ -239,6 +284,88 @@ class VirtualBox implements IHypervisor
         }
     }
 
+    public function setupDhcpServer(): void
+    {
+        // Check if DHCP server exists
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'list',
+            'dhcpservers',
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStdErr());
+        }
+
+        if (!empty(trim($result->getStdOut()))) {
+            // Already exists
+            Utils::outln('DHCP server already exists');
+            return;
+        }
+
+        Utils::outln('Configuring DHCP server');
+
+        // Enable DHCP server
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'dhcpserver',
+            'add',
+            '--interface', 'vboxnet0',
+            '--server-ip', '192.168.56.100',
+            '--netmask', '255.255.255.0',
+            '--lower-ip', '192.168.56.101',
+            '--upper-ip', '192.168.56.200',
+            '--enable',
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStdErr());
+        }
+    }
+
+    public function setupNetworkInterfaces(string $vmName): void
+    {
+        Utils::outln('Setting up network interfaces');
+
+        // NIC1: NAT
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'modifyvm',
+            $vmName,
+            '--nic1',
+            'nat',
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStdErr());
+        }
+
+        // NIC2: Host-only
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'modifyvm',
+            $vmName,
+            '--nic2', 'hostonly',
+            '--hostonlyadapter2', 'vboxnet0',
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStdErr());
+        }
+
+        // Probably not needed?
+        $result = (new ShellRunner())->run([
+            'VBoxManage',
+            'modifyvm',
+            $vmName,
+            '--cableconnected2', 'on',
+        ]);
+
+        if ($result->getStatus() !== 0) {
+            Utils::error('Error: ' . $result->getStdErr());
+        }
+    }
+
     public function setupStorageController(string $vmName): void
     {
         Utils::outln('Setting up storage controller: ' . self::STORAGE_CONTROLLER_NAME);
@@ -342,7 +469,7 @@ class VirtualBox implements IHypervisor
         }
     }
 
-    private function performStorageAttach(string $vmName, int $port, string $type, ?string $file): void
+    protected function performStorageAttach(string $vmName, int $port, string $type, ?string $file): void
     {
         $result = (new ShellRunner())->run([
             'VBoxManage',

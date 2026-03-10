@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# Create NFS export for a VM
+# This file should be run with sudo
+
+# Exit on errors
+set -e
+
+# Check we got 2 args
+if [ "$#" -lt 2 ]; then
+  echo "Usage: deven-create-nfs-export <vm-name> <directory>"
+  exit 1
+fi
+
+vmname="$1"
+dirname="$2"
+exportfile="/etc/exports.d/$vmname.exports"
+
+if [ -f "$exportfile" ]; then
+    echo "Export file $exportfile already exists!"
+    exit 0
+fi
+
+# Create the file
+echo "$dirname 192.168.56.0/24(rw,sync,no_subtree_check)" > "$exportfile"
+
+# Update changes
+exportfs -ra
+
+echo "Export file $exportfile created successfully"

@@ -7,6 +7,7 @@ use PekLaiho\Deven\Config;
 use PekLaiho\Deven\GuestAdditions;
 use PekLaiho\Deven\IHypervisor;
 use PekLaiho\Deven\NetworkConfig;
+use PekLaiho\Deven\NetworkFileSystem;
 use PekLaiho\Deven\SharedFolders;
 use PekLaiho\Deven\SshRunner;
 use PekLaiho\Deven\TermInfoInstaller;
@@ -30,13 +31,21 @@ class Create implements ICommand
         // Used to run SSH commands
         $sshRunner = new SshRunner($config->getSshPort());
 
+        // Ask user to create export for NFS before doing anything else
+        if ($config->useNetworkFileSystem()) {
+            $nfs = new NetworkFileSystem($hypervisor, $sshRunner);
+            if (!$nfs->checkExport($name, $config->getDir())) {
+                return;
+            }
+        }
+
         // Create and apply basic settings
         $hypervisor->create($name);
         $hypervisor->setCpusAndMemory($name, $config->getCpus(), $config->getRam() * 1024);
         $hypervisor->setupStorageController($name);
 
         // Configure NAT port forwarding
-        $networkConfig = new NetworkConfig($hypervisor);
+        $networkConfig = new NetworkConfig($hypervisor, $sshRunner);
         $networkConfig->configure($name, $config->getPorts());
 
         // Configure graphics controller
@@ -71,6 +80,9 @@ class Create implements ICommand
         $cloudInitStatus = new CloudInitStatus($sshRunner);
         $cloudInitStatus->waitForCompletion($name);
 
+        // Configure network settings for host-only interface
+        $networkConfig->configureWithSsh($name);
+
         // Lets reboot here before installing VBGA, because
         // it is possible that cloud-init installed a new kernel.
         $sshRunner->run($name, ['sudo', 'shutdown', 'now']);
@@ -100,6 +112,8 @@ class Create implements ICommand
         // Configure the shared folder
         if ($config->useVirtualBoxSharedFolders()) {
             $sharedFolders->configure($name);
+        } elseif ($config->useNetworkFileSystem()) {
+            $nfs->configure($name, $config->getDir());
         }
 
         // Final reboot to enable all config changes

@@ -49,7 +49,7 @@ class SharedFolders
         $this->sshRunner->run($vmName, ['sudo', 'systemctl', 'enable', 'deven.mount']);
     }
 
-    private function createMountFile(): string
+    protected function createMountFile(): string
     {
         $data = <<<'EOF'
 [Unit]
@@ -75,7 +75,7 @@ EOF;
         return $file;
     }
 
-    private function createVboxsfServiceFile(): string
+    protected function createVboxsfServiceFile(): string
     {
         $data = <<<'EOF'
 [Unit]
