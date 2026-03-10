@@ -2,6 +2,7 @@
 namespace PekLaiho\Deven\Cmd;
 
 use PekLaiho\Deven\Config;
+use PekLaiho\Deven\Convenience;
 use PekLaiho\Deven\GuestAdditions;
 use PekLaiho\Deven\IHypervisor;
 use PekLaiho\Deven\SshRunner;
@@ -19,12 +20,24 @@ class Configure implements ICommand
         }
 
         $subCommands = [
+            'config-install' => 'cmdInstallConfig',
             'mount-status' => 'cmdMountStatus',
             'vbga-install' => 'cmdVbgaInstall',
             'vbga-status' => 'cmdVbgaStatus',
         ];
 
         $this->handleSubCommand($subCommands, $hypervisor, $config, $args);
+    }
+
+    protected function cmdInstallConfig(IHypervisor $hypervisor, Config $config, array $args): void
+    {
+        $status = $hypervisor->status($config->getName());
+        if ($status['VMState'] !== 'running') {
+            Utils::error('The VM must be running first!');
+        }
+
+        $conv = new Convenience(new SshRunner($config->getSshPort()));
+        $conv->install($config->getName());
     }
 
     protected function cmdMountStatus(IHypervisor $hypervisor, Config $config, array $args): void

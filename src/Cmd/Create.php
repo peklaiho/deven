@@ -4,6 +4,7 @@ namespace PekLaiho\Deven\Cmd;
 use PekLaiho\Deven\CloudInitSeedGenerator;
 use PekLaiho\Deven\CloudInitStatus;
 use PekLaiho\Deven\Config;
+use PekLaiho\Deven\Convenience;
 use PekLaiho\Deven\GuestAdditions;
 use PekLaiho\Deven\IHypervisor;
 use PekLaiho\Deven\NetworkConfig;
@@ -108,6 +109,10 @@ class Create implements ICommand
         // Install terminfo if needed
         $termInfo = new TermInfoInstaller($sshRunner);
         $termInfo->install($name);
+
+        // Convenience stuff (config files)
+        $convenience = new Convenience($sshRunner);
+        $convenience->install($name);
 
         // Configure the shared folder
         if ($config->useVirtualBoxSharedFolders()) {
