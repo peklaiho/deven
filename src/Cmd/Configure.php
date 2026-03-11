@@ -20,7 +20,7 @@ class Configure implements ICommand
         }
 
         $subCommands = [
-            'config-install' => 'cmdInstallConfig',
+            'convenience' => 'cmdConvenience',
             'mount-status' => 'cmdMountStatus',
             'vbga-install' => 'cmdVbgaInstall',
             'vbga-status' => 'cmdVbgaStatus',
@@ -29,7 +29,7 @@ class Configure implements ICommand
         $this->handleSubCommand($subCommands, $hypervisor, $config, $args);
     }
 
-    protected function cmdInstallConfig(IHypervisor $hypervisor, Config $config, array $args): void
+    protected function cmdConvenience(IHypervisor $hypervisor, Config $config, array $args): void
     {
         $status = $hypervisor->status($config->getName());
         if ($status['VMState'] !== 'running') {
@@ -37,7 +37,7 @@ class Configure implements ICommand
         }
 
         $conv = new Convenience(new SshRunner($config->getSshPort()));
-        $conv->install($config->getName());
+        $conv->install($config->getName(), $config->getConvenienceFiles());
     }
 
     protected function cmdMountStatus(IHypervisor $hypervisor, Config $config, array $args): void

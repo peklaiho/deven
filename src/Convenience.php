@@ -9,22 +9,16 @@ class Convenience
 
     }
 
-    public function install(string $vmName): void
+    public function install(string $vmName, array $files): void
     {
-        $configFiles = [
-            '.bash_aliases',
-            '.tmux.conf',
-        ];
-
-        foreach ($configFiles as $file) {
-            $source = HOME_DIR . DIRECTORY_SEPARATOR . $file;
-            $target = '~/' . $file;
+        foreach ($files as $source => $target) {
+            $source = str_replace('~', HOME_DIR, $source);
 
             if (file_exists($source)) {
-                Utils::outln("Copying config file $file to VM");
+                Utils::outln("Copying file to VM: $source => $target");
                 $this->sshRunner->copyFile($vmName, $source, $target);
             } else {
-                Utils::outln("Config file $file not found, unable to copy to VM");
+                Utils::outln("File $source not found, unable to copy to VM");
             }
         }
     }

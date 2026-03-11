@@ -12,6 +12,11 @@ class Config
         2222 => 22
     ];
 
+    protected array $convenienceFiles = [
+        '~/.bash_aliases' => '~/.bash_aliases',
+        '~/.tmux.conf' => '~/.tmux.conf',
+    ];
+
     public function __construct(
         protected string $name,
         protected string $dir
@@ -54,6 +59,11 @@ class Config
     public function getPorts(): array
     {
         return $this->ports;
+    }
+
+    public function getConvenienceFiles(): array
+    {
+        return $this->convenienceFiles;
     }
 
     // Optional install steps
@@ -104,6 +114,13 @@ class Config
             $this->ports[2222] = 22;
         }
     }
+
+    public function setConvenienceFiles(array $value): void
+    {
+        $this->convenienceFiles = $value;
+    }
+
+    // Helpers
 
     public function getSshPort(): int
     {

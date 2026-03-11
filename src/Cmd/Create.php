@@ -112,7 +112,7 @@ class Create implements ICommand
 
         // Convenience stuff (config files)
         $convenience = new Convenience($sshRunner);
-        $convenience->install($name);
+        $convenience->install($name, $config->getConvenienceFiles());
 
         // Configure the shared folder
         if ($config->useVirtualBoxSharedFolders()) {
