@@ -5,7 +5,7 @@ class CloudInitSeedGenerator
 {
     public function make(string $name): string
     {
-        $targetFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . "seed-$name.iso";
+        $targetFile = DEVEN_TMP_DIR . DIRECTORY_SEPARATOR . "$name-seed.iso";
 
         // Get or create SSH keys
         $hostKey = (new SshKeyManager())->getHostKey();
